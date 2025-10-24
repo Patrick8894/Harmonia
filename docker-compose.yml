@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  api-gw:
+    build:
+      context: ./api-gw
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    environment:
+      - GIN_MODE=debug
+      - GOTOOLCHAIN=auto
+    volumes:
+      - ./api-gw:/app
+      - api_gw_gomod:/go/pkg/mod
+      - api_gw_tmp:/app/tmp
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_TELEMETRY_DISABLED=1
+      - API_HOST=api-gw
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api-gw
+    command: npm run dev -- -p 3000 -H 0.0.0.0
+
+  reco-py:
+    build:
+      context: ./reco-py
+      dockerfile: Dockerfile.dev
+    ports:
+      - "9002:9002"
+    volumes:
+      - ./reco-py:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python main.py
+
+  engine-cpp:
+    build:
+      context: ./engine-cpp
+      dockerfile: Dockerfile.dev
+    ports:
+      - "9101:9101"
+    volumes:
+      - ./engine-cpp:/app
+    command: ./build/engine
+
+
+volumes:
+  api_gw_gomod:
+  api_gw_tmp:

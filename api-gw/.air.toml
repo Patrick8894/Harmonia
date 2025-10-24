@@ -1,0 +1,9 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/api-gw main.go"
+bin = "tmp/api-gw"
+full_bin = "./tmp/api-gw"
+include_ext = ["go"]
+exclude_dir = ["tmp", "vendor"]

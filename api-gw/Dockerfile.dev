@@ -1,0 +1,21 @@
+FROM golang:1.23-alpine
+
+# Let Go auto-download the required toolchain (e.g., 1.25.x)
+ENV GOTOOLCHAIN=auto
+
+RUN apk add --no-cache git build-base
+
+WORKDIR /app
+
+# Cache deps
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Hot reload tool (Air)
+RUN go install github.com/air-verse/air@latest
+
+# App source
+COPY . .
+
+EXPOSE 8080
+CMD ["air", "-c", ".air.toml"]

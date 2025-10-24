@@ -1,0 +1,20 @@
+FROM ubuntu:22.04
+
+# Install Thrift + Boost + build tools
+RUN apt-get update && apt-get install -y \
+    build-essential cmake thrift-compiler libthrift-dev libboost-all-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Generate thrift stubs
+RUN thrift -r --gen cpp thrift/engine.thrift
+
+# Build
+RUN rm -rf build && mkdir build && cd build && cmake .. && make -j4
+
+EXPOSE 9101
+CMD ["./build/engine"]

@@ -1,0 +1,39 @@
+basePath: /api
+info:
+  contact: {}
+  description: REST gateway for the Harmonia project. Orchestrates Python (gRPC) and
+    C++ (Thrift) services.
+  title: Harmonia API
+  version: 0.1.1
+paths:
+  /healthz:
+    get:
+      description: Liveness/readiness probe endpoint
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /hello:
+    get:
+      description: Basic greeting from Harmonia API Gateway
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Hello endpoint
+      tags:
+      - root
+swagger: "2.0"

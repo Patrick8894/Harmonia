@@ -1,0 +1,8 @@
+.tmp
+tmp
+.git
+vendor
+dist
+bin
+docs/swagger.json
+docs/swagger.yaml
