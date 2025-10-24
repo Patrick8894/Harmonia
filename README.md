@@ -32,6 +32,3 @@ React / Next.js  ── REST ──▶  Go API Gateway (Gin)
 - **Backend:** Go (Gin, Viper, Zap), Python (gRPC), C++ (Thrift)
 - **Database:** Oracle, Redis
 - **Deployment:** Docker Compose / Kubernetes-ready
-
-## License
-MIT License © 2025 Bo-Hao Wu

@@ -1,4 +1,4 @@
-FROM golang:1.23-alpine
+FROM golang:1.25-alpine
 
 # Let Go auto-download the required toolchain (e.g., 1.25.x)
 ENV GOTOOLCHAIN=auto

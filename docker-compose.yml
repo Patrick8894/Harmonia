@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api-gw:
     build:
@@ -49,8 +47,6 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "9101:9101"
-    volumes:
-      - ./engine-cpp:/app
     command: ./build/engine
 
 
