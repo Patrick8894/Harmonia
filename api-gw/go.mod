@@ -1,12 +1,15 @@
 module github.com/Patrick8894/harmonia/api-gw
 
-go 1.23.2
+go 1.24.0
 
 require (
+	github.com/apache/thrift v0.22.0
 	github.com/gin-gonic/gin v1.11.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
+	google.golang.org/grpc v1.76.0
+	google.golang.org/protobuf v1.36.9
 )
 
 require (
@@ -49,6 +52,6 @@ require (
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/tools v0.34.0 // indirect
-	google.golang.org/protobuf v1.36.9 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

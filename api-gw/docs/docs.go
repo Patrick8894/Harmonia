@@ -15,6 +15,47 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/engine/hello": {
+            "get": {
+                "description": "Triggers the Hello RPC on the C++ Thrift EngineService",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "engine"
+                ],
+                "summary": "Call C++ EngineService Hello RPC",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "World",
+                        "description": "Name to greet",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/healthz": {
             "get": {
                 "description": "Liveness/readiness probe endpoint",
@@ -60,8 +101,67 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/logic/hello": {
+            "get": {
+                "description": "Triggers the Hello RPC on the Python gRPC LogicService",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logic"
+                ],
+                "summary": "Call Python LogicService Hello RPC",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "World",
+                        "description": "Name to greet",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
-    }
+    },
+    "tags": [
+        {
+            "description": "Root endpoints",
+            "name": "root"
+        },
+        {
+            "description": "Python gRPC LogicService",
+            "name": "logic"
+        },
+        {
+            "description": "C++ Thrift EngineService",
+            "name": "engine"
+        },
+        {
+            "description": "Liveness \u0026 readiness",
+            "name": "health"
+        }
+    ]
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

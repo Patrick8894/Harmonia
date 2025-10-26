@@ -7,7 +7,7 @@ set -e
 #   ./build.sh run          → generate stubs and run main.py
 #   ./build.sh clean        → remove generated files
 
-PROTO_DIR="proto"
+PROTO_DIR="../proto"
 GEN_DIR="."
 PROTO_FILE="$PROTO_DIR/logic.proto"
 VENV_DIR=".venv"

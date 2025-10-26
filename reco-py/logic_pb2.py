@@ -24,13 +24,14 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogic.proto\x12\x07reco.v1\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t2E\n\x0cLogicService\x12\x35\n\x05Hello\x12\x15.reco.v1.HelloRequest\x1a\x13.reco.v1.HelloReply\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogic.proto\x12\x07reco.v1\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t2E\n\x0cLogicService\x12\x35\n\x05Hello\x12\x15.reco.v1.HelloRequest\x1a\x13.reco.v1.HelloReply\"\x00\x42=Z;github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'logic_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-  DESCRIPTOR._loaded_options = None
+  _globals['DESCRIPTOR']._loaded_options = None
+  _globals['DESCRIPTOR']._serialized_options = b'Z;github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1'
   _globals['_HELLOREQUEST']._serialized_start=24
   _globals['_HELLOREQUEST']._serialized_end=52
   _globals['_HELLOREPLY']._serialized_start=54

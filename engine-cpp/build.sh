@@ -7,7 +7,7 @@ set -e
 #   ./build.sh run      → build + run
 #   ./build.sh clean    → remove build and generated files
 
-THRIFT_FILE="thrift/engine.thrift"
+THRIFT_FILE="../thrift/engine.thrift"
 BUILD_DIR="build"
 GEN_DIR="gen-cpp"
 EXECUTABLE="$BUILD_DIR/engine"

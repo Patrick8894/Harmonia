@@ -8,6 +8,8 @@ services:
     environment:
       - GIN_MODE=debug
       - GOTOOLCHAIN=auto
+      - LOGIC_ADDR=reco-py:9002
+      - ENGINE_ADDR=engine-cpp:9101
     volumes:
       - ./api-gw:/app
       - api_gw_gomod:/go/pkg/mod

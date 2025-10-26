@@ -16,12 +16,11 @@ class EngineServiceHandler : public EngineServiceIf {
 public:
     EngineServiceHandler() {}
 
-    void Compute(ComputeResult& _return, const ComputeTask& task) override {
-        std::cout << "[Engine] Received task_id=" << task.task_id
-                  << ", payload=" << task.payload_json << std::endl;
-        _return.task_id = task.task_id;
-        _return.code = 0;
-        _return.result_json = R"({"result":"ok","from":"C++ Engine"})";
+    void Hello(HelloReply& _return, const HelloRequest& req) override {
+        
+        std::cout << "[Engine] Received HelloRequest from name=" << req.name << std::endl;
+        
+        _return.message = "Hello " + req.name + " from C++ Engine!";
     }
 };
 
