@@ -2,8 +2,11 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-cmd = "go build -o ./tmp/api-gw main.go"
+# Build the new entry point
+cmd = "go build -o ./tmp/api-gw ./cmd/api"
 bin = "tmp/api-gw"
 full_bin = "./tmp/api-gw"
+
+# Watch all .go files but ignore build/tmp/vendor/gen folders
 include_ext = ["go"]
-exclude_dir = ["tmp", "vendor"]
+exclude_dir = ["tmp", "vendor", "gen"]

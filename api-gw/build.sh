@@ -13,7 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROTO_DIR="${SCRIPT_DIR}/../proto"
 OUT_DIR="${SCRIPT_DIR}/gen/logic/v1"
 SWAGGER_OUT="${SCRIPT_DIR}/docs"
-GENERAL_INFO="${SCRIPT_DIR}/main.go"   # entry scanned by swag
+GENERAL_INFO="${SCRIPT_DIR}/cmd/api/main.go"   # entry scanned by swag
 
 THRIFT_IDL="${SCRIPT_DIR}/../thrift/engine.thrift"
 THRIFT_OUT_BASE="${SCRIPT_DIR}/gen"    # thrift will create ${THRIFT_OUT_BASE}/engine/
@@ -66,11 +66,16 @@ fi
 echo "🧽 Refreshing Swagger docs in ${SWAGGER_OUT} ..."
 rm -rf "${SWAGGER_OUT}"
 
+pushd "${SCRIPT_DIR}/cmd/api" >/dev/null
+
 swag init \
   --parseDependency \
   --parseInternal \
-  --dir "${SCRIPT_DIR}" \
   --generalInfo "main.go" \
-  --output "${SWAGGER_OUT}"
+  --dir "./,../../internal/auth,../../internal/engine,../../internal/health,../../internal/hello,../../internal/httpserver,../../internal/logic" \
+  --exclude "../gen,../docs,../tmp,../vendor" \
+  --output "../../docs"
+
+popd >/dev/null
 
 echo "✅ Done."

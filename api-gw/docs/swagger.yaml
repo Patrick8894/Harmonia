@@ -1,4 +1,12 @@
 basePath: /api
+definitions:
+  auth.loginReq:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   description: REST gateway for the Harmonia project. Orchestrates Python (gRPC) and
@@ -6,15 +14,69 @@ info:
   title: Harmonia API
   version: 0.1.1
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Create a session and set an HTTP-only cookie
+      parameters:
+      - description: Credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/auth.loginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Invalidate the session and clear the cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Logout
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Returns the logged-in user if any
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Current user
+      tags:
+      - auth
   /engine/hello:
     get:
       description: Triggers the Hello RPC on the C++ Thrift EngineService
-      parameters:
-      - default: World
-        description: Name to greet
-        in: query
-        name: name
-        type: string
       produces:
       - application/json
       responses:
@@ -66,12 +128,6 @@ paths:
   /logic/hello:
     get:
       description: Triggers the Hello RPC on the Python gRPC LogicService
-      parameters:
-      - default: World
-        description: Name to greet
-        in: query
-        name: name
-        type: string
       produces:
       - application/json
       responses:
@@ -94,6 +150,8 @@ swagger: "2.0"
 tags:
 - description: Root endpoints
   name: root
+- description: Authentication endpoints
+  name: auth
 - description: Python gRPC LogicService
   name: logic
 - description: C++ Thrift EngineService
