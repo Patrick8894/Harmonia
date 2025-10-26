@@ -61,7 +61,15 @@ services:
   #   volumes:
   #     - oracle_data:/opt/oracle/oradata
 
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+
 volumes:
   api_gw_gomod:
   api_gw_tmp:
   oracle_data:
+  redis_data:

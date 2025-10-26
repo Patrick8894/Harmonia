@@ -16,7 +16,6 @@ type Client struct {
 func NewClient(addr string) *Client { return &Client{addr: addr} }
 
 func (c *Client) hello(ctx context.Context, name string) (string, error) {
-	// Buffered transport + binary protocol to match your C++ server
 	tf := thrift.NewTBufferedTransportFactory(8192)
 	pf := thrift.NewTBinaryProtocolFactoryConf(nil)
 	cfg := &thrift.TConfiguration{
