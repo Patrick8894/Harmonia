@@ -51,7 +51,17 @@ services:
       - "9101:9101"
     command: ./build/engine
 
+  # oracle-db:
+  #   image: gvenzl/oracle-xe
+  #   ports:
+  #     - "1521:1521"
+  #     - "5500:5500"
+  #   environment:
+  #     - ORACLE_PASSWORD=password
+  #   volumes:
+  #     - oracle_data:/opt/oracle/oradata
 
 volumes:
   api_gw_gomod:
   api_gw_tmp:
+  oracle_data:
