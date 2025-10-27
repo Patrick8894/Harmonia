@@ -107,6 +107,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/register": {
+            "post": {
+                "description": "Creates a user with unique username; logs user in by setting the session cookie",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "New user",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.registerReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/engine/hello": {
             "get": {
                 "description": "Triggers the Hello RPC on the C++ Thrift EngineService",
@@ -117,6 +181,15 @@ const docTemplate = `{
                     "engine"
                 ],
                 "summary": "Call C++ EngineService Hello RPC",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "World",
+                        "description": "Name to greet",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -195,6 +268,15 @@ const docTemplate = `{
                     "logic"
                 ],
                 "summary": "Call Python LogicService Hello RPC",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "World",
+                        "description": "Name to greet",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -221,6 +303,21 @@ const docTemplate = `{
     "definitions": {
         "auth.loginReq": {
             "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.registerReq": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
                     "type": "string"

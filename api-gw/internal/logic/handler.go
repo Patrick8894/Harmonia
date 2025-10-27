@@ -13,6 +13,7 @@ import (
 // @Description  Triggers the Hello RPC on the Python gRPC LogicService
 // @Tags         logic
 // @Produce      json
+// @Param        name  query  string  false  "Name to greet"  default(World)
 // @Success      200   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Router       /logic/hello [get]

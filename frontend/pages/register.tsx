@@ -1,8 +1,8 @@
 import { FormEvent, useState, useEffect } from 'react';
-import { login } from '../lib/api';
-import Header from '../components/Header';
 import { useRouter } from 'next/router';
+import { register } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import Header from '../components/Header';
 import Link from 'next/link';
 import {
   Box,
@@ -15,35 +15,46 @@ import {
   Stack,
   CircularProgress
 } from '@mui/material';
-import { Login as LoginIcon } from '@mui/icons-material';
+import { PersonAdd as RegisterIcon } from '@mui/icons-material';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { user, refresh } = useAuth();
 
-  // If already logged in, bounce to "next" or home
+  // If already logged in, redirect to home
   useEffect(() => {
     if (user) {
-      const next = (router.query.next as string) || '/';
-      router.replace(next);
+      router.replace('/');
     }
   }, [user, router]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr('');
+
+    // Validation
+    if (password !== confirmPassword) {
+      setErr('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setErr('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
     try {
-      await login(username, password);
-      await refresh(); // refresh context
-      const next = (router.query.next as string) || '/';
-      router.replace(next);
+      await register(username, password);
+      await refresh();
+      router.replace('/');
     } catch (e: any) {
-      setErr(e?.message || 'Login failed');
+      setErr(e?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -87,13 +98,13 @@ export default function LoginPage() {
                     margin: '0 auto 16px',
                   }}
                 >
-                  <LoginIcon sx={{ fontSize: 32, color: 'white' }} />
+                  <RegisterIcon sx={{ fontSize: 32, color: 'white' }} />
                 </Box>
                 <Typography variant="h4" fontWeight={700} gutterBottom>
-                  Sign In
+                  Create Account
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Access the Harmonia hybrid compute platform
+                  Join the Harmonia hybrid compute platform
                 </Typography>
               </Box>
 
@@ -122,7 +133,18 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     fullWidth
                     required
-                    autoComplete="current-password"
+                    autoComplete="new-password"
+                    disabled={loading}
+                    helperText="Minimum 6 characters"
+                  />
+                  <TextField
+                    label="Confirm Password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    fullWidth
+                    required
+                    autoComplete="new-password"
                     disabled={loading}
                   />
                   <Button
@@ -144,40 +166,35 @@ export default function LoginPage() {
                     {loading ? (
                       <>
                         <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
-                        Signing in...
+                        Creating account...
                       </>
                     ) : (
-                      'Sign In'
+                      'Create Account'
                     )}
                   </Button>
                 </Stack>
               </form>
 
-              <Box sx={{ textAlign: 'center', pt: 2 }}>
-                <Typography variant="body2" color="text.secondary" mb={2}>
-                  Demo credentials: admin / admin
+              <Box sx={{ textAlign: 'center', pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Already have an account?{' '}
+                  <Link href="/login" passHref legacyBehavior>
+                    <Typography
+                      component="a"
+                      variant="body2"
+                      sx={{
+                        color: '#667eea',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        }
+                      }}
+                    >
+                      Sign In
+                    </Typography>
+                  </Link>
                 </Typography>
-                <Box sx={{ pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Don&apos;t have an account?{' '}
-                    <Link href="/register" passHref legacyBehavior>
-                      <Typography
-                        component="a"
-                        variant="body2"
-                        sx={{
-                          color: '#667eea',
-                          textDecoration: 'none',
-                          fontWeight: 600,
-                          '&:hover': {
-                            textDecoration: 'underline',
-                          }
-                        }}
-                      >
-                        Create Account
-                      </Typography>
-                    </Link>
-                  </Typography>
-                </Box>
               </Box>
             </Stack>
           </Paper>

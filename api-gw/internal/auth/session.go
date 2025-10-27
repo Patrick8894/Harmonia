@@ -3,33 +3,40 @@ package auth
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
 	"sync"
 	"time"
 )
 
-type Session struct {
-	User      string
-	CreatedAt time.Time
-	ExpiresAt time.Time
+// SessionStore is the abstraction used by controllers/middleware.
+type SessionStore interface {
+	Create(user string) (token string, err error)
+	Get(token string) (user string, ok bool)
+	Delete(token string)
 }
 
-type Store struct {
-	mu       sync.RWMutex
-	sessions map[string]Session
-	ttl      time.Duration
-	secret   string
-}
+// -------- In-Memory implementation (dev/fallback) --------
 
-func NewStore(ttl time.Duration, secret string) *Store {
-	return &Store{
-		sessions: make(map[string]Session),
-		ttl:      ttl,
-		secret:   secret,
+type memoryStore struct {
+	mu  sync.RWMutex
+	ttl time.Duration
+	// token -> (user, expiry)
+	data map[string]struct {
+		user   string
+		expiry time.Time
 	}
 }
 
-func randomToken(n int) (string, error) {
+func NewMemoryStore(ttl time.Duration) SessionStore {
+	return &memoryStore{
+		ttl: ttl,
+		data: make(map[string]struct {
+			user   string
+			expiry time.Time
+		}),
+	}
+}
+
+func randToken(n int) (string, error) {
 	b := make([]byte, n)
 	if _, err := rand.Read(b); err != nil {
 		return "", err
@@ -37,42 +44,35 @@ func randomToken(n int) (string, error) {
 	return base64.RawURLEncoding.EncodeToString(b), nil
 }
 
-func (s *Store) Create(user string) (string, Session, error) {
-	token, err := randomToken(32)
+func (m *memoryStore) Create(user string) (string, error) {
+	tok, err := randToken(32)
 	if err != nil {
-		return "", Session{}, err
+		return "", err
 	}
-	now := time.Now()
-	sess := Session{
-		User:      user,
-		CreatedAt: now,
-		ExpiresAt: now.Add(s.ttl),
-	}
-	s.mu.Lock()
-	s.sessions[token] = sess
-	s.mu.Unlock()
-	return token, sess, nil
+	m.mu.Lock()
+	m.data[tok] = struct {
+		user   string
+		expiry time.Time
+	}{user: user, expiry: time.Now().Add(m.ttl)}
+	m.mu.Unlock()
+	return tok, nil
 }
 
-func (s *Store) Get(token string) (Session, bool) {
-	s.mu.RLock()
-	sess, ok := s.sessions[token]
-	s.mu.RUnlock()
-	if !ok {
-		return Session{}, false
+func (m *memoryStore) Get(tok string) (string, bool) {
+	m.mu.RLock()
+	rec, ok := m.data[tok]
+	m.mu.RUnlock()
+	if !ok || time.Now().After(rec.expiry) {
+		if ok {
+			m.Delete(tok)
+		}
+		return "", false
 	}
-	if time.Now().After(sess.ExpiresAt) {
-		// expire
-		s.Delete(token)
-		return Session{}, false
-	}
-	return sess, true
+	return rec.user, true
 }
 
-func (s *Store) Delete(token string) {
-	s.mu.Lock()
-	delete(s.sessions, token)
-	s.mu.Unlock()
+func (m *memoryStore) Delete(tok string) {
+	m.mu.Lock()
+	delete(m.data, tok)
+	m.mu.Unlock()
 }
-
-var ErrInvalidCreds = errors.New("invalid username or password")

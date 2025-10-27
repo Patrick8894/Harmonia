@@ -2,28 +2,25 @@ package auth
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Controller struct {
-	store        *Store
+	users        *UserRepo
+	sess         SessionStore
 	cookieName   string
 	cookieDom    string
 	cookieSec    bool
 	cookieMaxAge int
 }
 
-// In a real system, replace this with DB/LDAP/OAuth etc.
-func validateUserPass(user, pass string) bool {
-	// demo: single local user
-	return (user == "admin" && pass == "admin") || (user == "patrick" && pass == "patrick")
-}
-
-func NewController(store *Store, cookieName, cookieDomain string, cookieSecure bool, cookieMaxAge int) *Controller {
+func NewController(users *UserRepo, sess SessionStore, cookieName, cookieDomain string, cookieSecure bool, cookieMaxAge int) *Controller {
 	return &Controller{
-		store:        store,
+		users:        users,
+		sess:         sess,
 		cookieName:   cookieName,
 		cookieDom:    cookieDomain,
 		cookieSec:    cookieSecure,
@@ -36,11 +33,80 @@ type loginReq struct {
 	Password string `json:"password"`
 }
 
+type registerReq struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 func (a *Controller) Register(rg *gin.RouterGroup) {
 	g := rg.Group("/auth")
+	g.POST("/register", a.RegisterUser) // <-- new
 	g.POST("/login", a.Login)
 	g.POST("/logout", a.Logout)
 	g.GET("/me", a.Me)
+}
+
+// RegisterUser godoc
+// @Summary      Register a new user
+// @Description  Creates a user with unique username; logs user in by setting the session cookie
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        payload  body  registerReq  true  "New user"
+// @Success      201      {object}  map[string]string
+// @Failure      400      {object}  map[string]string
+// @Failure      409      {object}  map[string]string
+// @Failure      500      {object}  map[string]string
+// @Router       /auth/register [post]
+func (a *Controller) RegisterUser(c *gin.Context) {
+	var req registerReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload"})
+		return
+	}
+
+	req.Username = strings.TrimSpace(req.Username)
+	if len(req.Username) < 3 || len(req.Username) > 64 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "username must be 3-64 chars"})
+		return
+	}
+	if len(req.Password) < 6 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "password must be at least 6 chars"})
+		return
+	}
+
+	u, err := a.users.Create(c, req.Username, req.Password)
+	if err != nil {
+		if err == ErrUserExists {
+			c.JSON(http.StatusConflict, gin.H{"error": "username already exists"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
+		return
+	}
+
+	// Auto-login: create session and set cookie
+	token, err := a.sess.Create(u.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session"})
+		return
+	}
+
+	maxAge := a.cookieMaxAge
+	c.SetCookie(a.cookieName, token, maxAge, "/", a.cookieDom, a.cookieSec, true)
+	c.Header("Set-Cookie", (&http.Cookie{
+		Name:     a.cookieName,
+		Value:    token,
+		Path:     "/",
+		Domain:   a.cookieDom,
+		Secure:   a.cookieSec,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   maxAge,
+		Expires:  time.Now().Add(time.Duration(maxAge) * time.Second),
+	}).String())
+
+	c.JSON(http.StatusCreated, gin.H{"message": "registered"})
 }
 
 // @Summary      Login
@@ -58,29 +124,22 @@ func (a *Controller) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid payload"})
 		return
 	}
-	if !validateUserPass(req.Username, req.Password) {
+
+	u, err := a.users.GetByUsername(c, req.Username)
+	if err != nil || u == nil || !CheckPassword(u.PasswordHash, req.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
-	token, _, err := a.store.Create(req.Username)
+
+	token, err := a.sess.Create(u.Username) // <— uses interface
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session"})
 		return
 	}
 
+	// Set cookie (SameSite=Lax via explicit header)
 	maxAge := a.cookieMaxAge
-	// Set cookie (HTTPOnly, SameSite=Lax)
-	c.SetCookie(
-		a.cookieName,
-		token,
-		maxAge,      // seconds
-		"/",         // path
-		a.cookieDom, // domain (can be empty)
-		a.cookieSec, // secure
-		true,        // httpOnly
-	)
-
-	// Also set SameSite explicitly (Gin SetCookie doesn’t expose it directly prior to v1.9)
+	c.SetCookie(a.cookieName, token, maxAge, "/", a.cookieDom, a.cookieSec, true)
 	c.Header("Set-Cookie", (&http.Cookie{
 		Name:     a.cookieName,
 		Value:    token,
@@ -105,7 +164,7 @@ func (a *Controller) Login(c *gin.Context) {
 func (a *Controller) Logout(c *gin.Context) {
 	token, _ := c.Cookie(a.cookieName)
 	if token != "" {
-		a.store.Delete(token)
+		a.sess.Delete(token)
 	}
 	// Clear cookie
 	c.SetCookie(a.cookieName, "", -1, "/", a.cookieDom, a.cookieSec, true)
@@ -131,15 +190,11 @@ func (a *Controller) Logout(c *gin.Context) {
 // @Success      200  {object}  map[string]string
 // @Router       /auth/me [get]
 func (a *Controller) Me(c *gin.Context) {
-	// Best-effort read (no 401)
-	token, _ := c.Cookie(a.cookieName)
-	if token == "" {
-		c.JSON(http.StatusOK, gin.H{"user": ""})
-		return
-	}
-	if sess, ok := a.store.Get(token); ok {
-		c.JSON(http.StatusOK, gin.H{"user": sess.User})
-		return
+	if token, _ := c.Cookie(a.cookieName); token != "" {
+		if user, ok := a.sess.Get(token); ok { // <— uses interface
+			c.JSON(http.StatusOK, gin.H{"user": user})
+			return
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{"user": ""})
 }

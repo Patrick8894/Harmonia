@@ -22,10 +22,10 @@ func RegisterRoutes(
 	healthCtrl *health.Controller,
 	helloCtrl *hello.Controller,
 	authCtrl *auth.Controller,
-	authStore *auth.Store,
+	sessStore auth.SessionStore,
 ) {
 	// Global auth middleware to parse cookie (non-fatal)
-	r.Use(auth.Middleware(cfg.CookieName, authStore))
+	r.Use(auth.Middleware(cfg.CookieName, sessStore))
 
 	api := r.Group("/api")
 
@@ -37,8 +37,8 @@ func RegisterRoutes(
 	health.Register(api, healthCtrl)
 
 	// Protected feature groups
-	engineParent := api.Group("", auth.RequireAuth(cfg.CookieName, authStore))
-	logicParent := api.Group("", auth.RequireAuth(cfg.CookieName, authStore))
+	engineParent := api.Group("", auth.RequireAuth(cfg.CookieName, sessStore))
+	logicParent := api.Group("", auth.RequireAuth(cfg.CookieName, sessStore))
 
 	// Features
 	engine.Register(engineParent, engSvc)

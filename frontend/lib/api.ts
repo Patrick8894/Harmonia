@@ -28,3 +28,14 @@ export async function logout() {
   if (!res.ok) throw new Error(await res.text().catch(() => 'Logout failed'));
   return res.json();
 }
+
+export async function register(username: string, password: string) {
+  const res = await fetch('/api/auth/register', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!res.ok) throw new Error(await res.text().catch(() => 'Registration failed'));
+  return res.json();
+}

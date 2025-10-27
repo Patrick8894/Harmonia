@@ -8,29 +8,26 @@ import (
 
 const CtxUserKey = "auth.user"
 
-func Middleware(cookieName string, store *Store) gin.HandlerFunc {
+func Middleware(cookieName string, store SessionStore) gin.HandlerFunc { // <— interface
 	return func(c *gin.Context) {
-		token, err := c.Cookie(cookieName)
-		if err != nil || token == "" {
-			c.Next()
-			return
-		}
-		if sess, ok := store.Get(token); ok {
-			c.Set(CtxUserKey, sess.User)
+		if token, err := c.Cookie(cookieName); err == nil && token != "" {
+			if user, ok := store.Get(token); ok {
+				c.Set(CtxUserKey, user)
+			}
 		}
 		c.Next()
 	}
 }
 
-func RequireAuth(cookieName string, store *Store) gin.HandlerFunc {
+func RequireAuth(cookieName string, store SessionStore) gin.HandlerFunc { // <— interface
 	return func(c *gin.Context) {
 		token, err := c.Cookie(cookieName)
 		if err != nil || token == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		if sess, ok := store.Get(token); ok {
-			c.Set(CtxUserKey, sess.User)
+		if user, ok := store.Get(token); ok {
+			c.Set(CtxUserKey, user)
 			c.Next()
 			return
 		}

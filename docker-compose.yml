@@ -6,6 +6,8 @@ services:
     ports:
       - "8080:8080"
     environment:
+      - DB_DSN=harmonia:harmonia@tcp(mysql:3306)/harmonia?parseTime=true
+      - REDIS_ADDR=redis:6379
       - GIN_MODE=debug
       - GOTOOLCHAIN=auto
       - LOGIC_ADDR=reco-py:9002
@@ -14,6 +16,11 @@ services:
       - ./api-gw:/app
       - api_gw_gomod:/go/pkg/mod
       - api_gw_tmp:/app/tmp
+    depends_on:
+      - mysql
+      - redis
+      - reco-py
+      - engine-cpp
 
   frontend:
     build:
@@ -51,25 +58,25 @@ services:
       - "9101:9101"
     command: ./build/engine
 
-  # oracle-db:
-  #   image: gvenzl/oracle-xe
-  #   ports:
-  #     - "1521:1521"
-  #     - "5500:5500"
-  #   environment:
-  #     - ORACLE_PASSWORD=password
-  #   volumes:
-  #     - oracle_data:/opt/oracle/oradata
+  mysql:
+    image: mysql:8.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=devpass
+      - MYSQL_DATABASE=harmonia
+      - MYSQL_USER=harmonia
+      - MYSQL_PASSWORD=harmonia
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
 
-  # redis:
-  #   image: redis:7-alpine
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
 
 volumes:
   api_gw_gomod:
   api_gw_tmp:
-  oracle_data:
-  redis_data:
+  mysql_data:

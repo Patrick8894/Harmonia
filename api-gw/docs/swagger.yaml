@@ -7,6 +7,16 @@ definitions:
       username:
         type: string
     type: object
+  auth.registerReq:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
 info:
   contact: {}
   description: REST gateway for the Harmonia project. Orchestrates Python (gRPC) and
@@ -74,9 +84,58 @@ paths:
       summary: Current user
       tags:
       - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a user with unique username; logs user in by setting the
+        session cookie
+      parameters:
+      - description: New user
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/auth.registerReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
   /engine/hello:
     get:
       description: Triggers the Hello RPC on the C++ Thrift EngineService
+      parameters:
+      - default: World
+        description: Name to greet
+        in: query
+        name: name
+        type: string
       produces:
       - application/json
       responses:
@@ -128,6 +187,12 @@ paths:
   /logic/hello:
     get:
       description: Triggers the Hello RPC on the Python gRPC LogicService
+      parameters:
+      - default: World
+        description: Name to greet
+        in: query
+        name: name
+        type: string
       produces:
       - application/json
       responses:

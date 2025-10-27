@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
 	_ "github.com/Patrick8894/harmonia/api-gw/docs"
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/Patrick8894/harmonia/api-gw/internal/auth"
 	"github.com/Patrick8894/harmonia/api-gw/internal/config"
@@ -15,6 +18,7 @@ import (
 	"github.com/Patrick8894/harmonia/api-gw/internal/hello"
 	"github.com/Patrick8894/harmonia/api-gw/internal/httpserver"
 	"github.com/Patrick8894/harmonia/api-gw/internal/logic"
+	"github.com/redis/go-redis/v9"
 )
 
 // @title           Harmonia API
@@ -40,22 +44,54 @@ import (
 func main() {
 	cfg := config.Load()
 
-	r := gin.Default()
-	r.SetTrustedProxies(nil)
+	// --- DB (users)
+	db, err := sql.Open("mysql", cfg.DBDSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
 
-	// RPC clients & services
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Migrations + dev seed data
+	if err := auth.RunMigrations(ctx, db); err != nil {
+		log.Fatal(err)
+	}
+	if err := auth.SeedDevData(ctx, db); err != nil {
+		log.Fatal(err)
+	}
+
+	// --- Sessions backend selection
+	var sessStore auth.SessionStore
+	switch cfg.SessionBackend {
+	case "redis":
+		rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr})
+		if err := rdb.Ping(context.Background()).Err(); err != nil {
+			log.Fatal(err)
+		}
+		sessStore = auth.NewRedisStore(rdb, time.Duration(cfg.CookieMaxAge)*time.Second, "sess:")
+	default:
+		sessStore = auth.NewMemoryStore(time.Duration(cfg.CookieMaxAge) * time.Second)
+	}
+
+	// --- Repos / Controllers / Services
+	userRepo := auth.NewUserRepo(db)
+	authCtrl := auth.NewController(userRepo, sessStore, cfg.CookieName, cfg.CookieDomain, cfg.CookieSecure, cfg.CookieMaxAge)
+
 	engineClient := engine.NewClient(cfg.EngineAddr)
 	engineSvc := engine.NewService(engineClient)
 
 	logicClient := logic.NewClient(cfg.LogicAddr)
 	logicSvc := logic.NewService(logicClient)
 
-	// Auth store & controller
-	authStore := auth.NewStore(time.Duration(cfg.CookieMaxAge)*time.Second, cfg.SessionSecret)
-	authCtrl := auth.NewController(authStore, cfg.CookieName, cfg.CookieDomain, cfg.CookieSecure, cfg.CookieMaxAge)
+	r := gin.Default()
+	r.SetTrustedProxies(nil)
 
-	// Register routes
-	httpserver.RegisterRoutes(r, cfg, engineSvc, logicSvc, health.New(), hello.New(), authCtrl, authStore)
+	// Register routes; pass sessStore to middleware inside httpserver.RegisterRoutes
+	httpserver.RegisterRoutes(r, cfg, engineSvc, logicSvc, health.New(), hello.New(), authCtrl, sessStore)
 
 	log.Println("Harmonia API listening on :8080")
 	if err := r.Run(":8080"); err != nil {
