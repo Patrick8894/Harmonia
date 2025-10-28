@@ -7,7 +7,7 @@
 - **Gateway:** Go (Gin) REST API as the orchestrator, managing authentication, routing, and aggregation.
 - **Logic Service:** Python (gRPC) microservice handling complex logical and data-processing tasks.
 - **Compute Engine:** C++ (Thrift) service performing high-speed numerical computations.
-- **Databases:** Oracle for persistent storage (auth, records) and Redis for caching task results.
+- **Databases:** MySQL for persistent storage (auth, records) and Redis for caching task results.
 
 ## Architecture
 ```
@@ -17,7 +17,7 @@ React / Next.js  ── REST ──▶  Go API Gateway (Gin)
                                └── Thrift ─▶ C++ Compute Engine
                                │
                                ▼
-                        Oracle + Redis
+                        MySQL + Redis
 ```
 
 ## Key Features
@@ -30,5 +30,5 @@ React / Next.js  ── REST ──▶  Go API Gateway (Gin)
 ## Tech Stack
 - **Frontend:** React, Next.js
 - **Backend:** Go (Gin, Viper, Zap), Python (gRPC), C++ (Thrift)
-- **Database:** Oracle, Redis
+- **Database:** MySQL, Redis
 - **Deployment:** Docker Compose / Kubernetes-ready
