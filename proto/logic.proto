@@ -4,15 +4,60 @@ package reco.v1;
 
 option go_package = "github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1";
 
-// Simple logic service to prove the pipe
 service LogicService {
   rpc Hello(HelloRequest) returns (HelloReply) {}
+  rpc Evaluate(EvalRequest) returns (EvalReply) {}
+  rpc Transform(TransformRequest) returns (TransformReply) {}
+  rpc PlanTasks(PlanRequest) returns (PlanReply) {}
 }
 
-message HelloRequest {
-  string name = 1;
+message HelloRequest { string name = 1; }
+message HelloReply { string message = 1; }
+
+message EvalRequest {
+  string expression = 1;
+  map<string, double> variables = 2;
+}
+message EvalReply {
+  double result = 1;
+  string error  = 2;
 }
 
-message HelloReply {
-  string message = 1;
+enum TransformOp {
+  TRANSFORM_OP_UNSPECIFIED = 0;
+  MAP = 1;
+  FILTER = 2;
+  SUM = 3;
+}
+message TransformRequest {
+  repeated double data = 1;
+  string expr = 2;
+  string var_name = 3;
+  TransformOp op = 4;
+}
+message TransformReply {
+  repeated double data = 1;
+  double result = 2;
+  string error = 3;
+}
+
+message PlanRequest {
+  string goal = 1;
+  repeated string hints = 2;
+  int32 max_steps = 3;
+}
+
+message Task {
+  string id = 1;
+  string title = 2;
+  string detail = 3;
+  int32 priority = 4;
+  int32 estimate_min = 5;
+  repeated string depends_on = 6;
+}
+
+message PlanReply {
+  repeated Task tasks = 1;
+  string notes = 2;
+  string error = 3;
 }

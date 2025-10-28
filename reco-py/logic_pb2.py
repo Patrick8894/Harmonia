@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogic.proto\x12\x07reco.v1\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t2E\n\x0cLogicService\x12\x35\n\x05Hello\x12\x15.reco.v1.HelloRequest\x1a\x13.reco.v1.HelloReply\"\x00\x42=Z;github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0blogic.proto\x12\x07reco.v1\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1d\n\nHelloReply\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x8b\x01\n\x0b\x45valRequest\x12\x12\n\nexpression\x18\x01 \x01(\t\x12\x36\n\tvariables\x18\x02 \x03(\x0b\x32#.reco.v1.EvalRequest.VariablesEntry\x1a\x30\n\x0eVariablesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"*\n\tEvalReply\x12\x0e\n\x06result\x18\x01 \x01(\x01\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"b\n\x10TransformRequest\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x01\x12\x0c\n\x04\x65xpr\x18\x02 \x01(\t\x12\x10\n\x08var_name\x18\x03 \x01(\t\x12 \n\x02op\x18\x04 \x01(\x0e\x32\x14.reco.v1.TransformOp\"=\n\x0eTransformReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x01\x12\x0e\n\x06result\x18\x02 \x01(\x01\x12\r\n\x05\x65rror\x18\x03 \x01(\t\"=\n\x0bPlanRequest\x12\x0c\n\x04goal\x18\x01 \x01(\t\x12\r\n\x05hints\x18\x02 \x03(\t\x12\x11\n\tmax_steps\x18\x03 \x01(\x05\"m\n\x04Task\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0e\n\x06\x64\x65tail\x18\x03 \x01(\t\x12\x10\n\x08priority\x18\x04 \x01(\x05\x12\x14\n\x0c\x65stimate_min\x18\x05 \x01(\x05\x12\x12\n\ndepends_on\x18\x06 \x03(\t\"G\n\tPlanReply\x12\x1c\n\x05tasks\x18\x01 \x03(\x0b\x32\r.reco.v1.Task\x12\r\n\x05notes\x18\x02 \x01(\t\x12\r\n\x05\x65rror\x18\x03 \x01(\t*I\n\x0bTransformOp\x12\x1c\n\x18TRANSFORM_OP_UNSPECIFIED\x10\x00\x12\x07\n\x03MAP\x10\x01\x12\n\n\x06\x46ILTER\x10\x02\x12\x07\n\x03SUM\x10\x03\x32\xf9\x01\n\x0cLogicService\x12\x35\n\x05Hello\x12\x15.reco.v1.HelloRequest\x1a\x13.reco.v1.HelloReply\"\x00\x12\x36\n\x08\x45valuate\x12\x14.reco.v1.EvalRequest\x1a\x12.reco.v1.EvalReply\"\x00\x12\x41\n\tTransform\x12\x19.reco.v1.TransformRequest\x1a\x17.reco.v1.TransformReply\"\x00\x12\x37\n\tPlanTasks\x12\x14.reco.v1.PlanRequest\x1a\x12.reco.v1.PlanReply\"\x00\x42=Z;github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,10 +32,30 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'logic_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z;github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1'
+  _globals['_EVALREQUEST_VARIABLESENTRY']._loaded_options = None
+  _globals['_EVALREQUEST_VARIABLESENTRY']._serialized_options = b'8\001'
+  _globals['_TRANSFORMOP']._serialized_start=681
+  _globals['_TRANSFORMOP']._serialized_end=754
   _globals['_HELLOREQUEST']._serialized_start=24
   _globals['_HELLOREQUEST']._serialized_end=52
   _globals['_HELLOREPLY']._serialized_start=54
   _globals['_HELLOREPLY']._serialized_end=83
-  _globals['_LOGICSERVICE']._serialized_start=85
-  _globals['_LOGICSERVICE']._serialized_end=154
+  _globals['_EVALREQUEST']._serialized_start=86
+  _globals['_EVALREQUEST']._serialized_end=225
+  _globals['_EVALREQUEST_VARIABLESENTRY']._serialized_start=177
+  _globals['_EVALREQUEST_VARIABLESENTRY']._serialized_end=225
+  _globals['_EVALREPLY']._serialized_start=227
+  _globals['_EVALREPLY']._serialized_end=269
+  _globals['_TRANSFORMREQUEST']._serialized_start=271
+  _globals['_TRANSFORMREQUEST']._serialized_end=369
+  _globals['_TRANSFORMREPLY']._serialized_start=371
+  _globals['_TRANSFORMREPLY']._serialized_end=432
+  _globals['_PLANREQUEST']._serialized_start=434
+  _globals['_PLANREQUEST']._serialized_end=495
+  _globals['_TASK']._serialized_start=497
+  _globals['_TASK']._serialized_end=606
+  _globals['_PLANREPLY']._serialized_start=608
+  _globals['_PLANREPLY']._serialized_end=679
+  _globals['_LOGICSERVICE']._serialized_start=757
+  _globals['_LOGICSERVICE']._serialized_end=1006
 # @@protoc_insertion_point(module_scope)

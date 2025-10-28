@@ -26,8 +26,7 @@ if _version_not_supported:
 
 
 class LogicServiceStub(object):
-    """Simple logic service to prove the pipe
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -40,13 +39,45 @@ class LogicServiceStub(object):
                 request_serializer=logic__pb2.HelloRequest.SerializeToString,
                 response_deserializer=logic__pb2.HelloReply.FromString,
                 _registered_method=True)
+        self.Evaluate = channel.unary_unary(
+                '/reco.v1.LogicService/Evaluate',
+                request_serializer=logic__pb2.EvalRequest.SerializeToString,
+                response_deserializer=logic__pb2.EvalReply.FromString,
+                _registered_method=True)
+        self.Transform = channel.unary_unary(
+                '/reco.v1.LogicService/Transform',
+                request_serializer=logic__pb2.TransformRequest.SerializeToString,
+                response_deserializer=logic__pb2.TransformReply.FromString,
+                _registered_method=True)
+        self.PlanTasks = channel.unary_unary(
+                '/reco.v1.LogicService/PlanTasks',
+                request_serializer=logic__pb2.PlanRequest.SerializeToString,
+                response_deserializer=logic__pb2.PlanReply.FromString,
+                _registered_method=True)
 
 
 class LogicServiceServicer(object):
-    """Simple logic service to prove the pipe
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def Hello(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Evaluate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Transform(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PlanTasks(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -60,6 +91,21 @@ def add_LogicServiceServicer_to_server(servicer, server):
                     request_deserializer=logic__pb2.HelloRequest.FromString,
                     response_serializer=logic__pb2.HelloReply.SerializeToString,
             ),
+            'Evaluate': grpc.unary_unary_rpc_method_handler(
+                    servicer.Evaluate,
+                    request_deserializer=logic__pb2.EvalRequest.FromString,
+                    response_serializer=logic__pb2.EvalReply.SerializeToString,
+            ),
+            'Transform': grpc.unary_unary_rpc_method_handler(
+                    servicer.Transform,
+                    request_deserializer=logic__pb2.TransformRequest.FromString,
+                    response_serializer=logic__pb2.TransformReply.SerializeToString,
+            ),
+            'PlanTasks': grpc.unary_unary_rpc_method_handler(
+                    servicer.PlanTasks,
+                    request_deserializer=logic__pb2.PlanRequest.FromString,
+                    response_serializer=logic__pb2.PlanReply.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'reco.v1.LogicService', rpc_method_handlers)
@@ -69,8 +115,7 @@ def add_LogicServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class LogicService(object):
-    """Simple logic service to prove the pipe
-    """
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def Hello(request,
@@ -89,6 +134,87 @@ class LogicService(object):
             '/reco.v1.LogicService/Hello',
             logic__pb2.HelloRequest.SerializeToString,
             logic__pb2.HelloReply.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Evaluate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/reco.v1.LogicService/Evaluate',
+            logic__pb2.EvalRequest.SerializeToString,
+            logic__pb2.EvalReply.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Transform(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/reco.v1.LogicService/Transform',
+            logic__pb2.TransformRequest.SerializeToString,
+            logic__pb2.TransformReply.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def PlanTasks(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/reco.v1.LogicService/PlanTasks',
+            logic__pb2.PlanRequest.SerializeToString,
+            logic__pb2.PlanReply.FromString,
             options,
             channel_credentials,
             insecure,

@@ -1,19 +1,13 @@
-import grpc
-from concurrent import futures
 import time
+from concurrent import futures
+import grpc
 
-import logic_pb2, logic_pb2_grpc
+import logic_pb2_grpc
+from logic_service.service import LogicService
+# (optional) from logic_service.logging_setup import configure_logging
 
-class LogicService(logic_pb2_grpc.LogicServiceServicer):
-    def Hello(self, request, context):
-        """
-        Implements the Hello RPC defined in logic.proto.
-        """
-        print(f"[Reco] Received Hello request for name={request.name}")
-        message = f"Hello, {request.name} from Python LogicService!"
-        return logic_pb2.HelloReply(message=message)
-
-def serve():
+def serve() -> None:
+    # configure_logging()  # if you want structured logs
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     logic_pb2_grpc.add_LogicServiceServicer_to_server(LogicService(), server)
     server.add_insecure_port("[::]:9002")

@@ -68,6 +68,6 @@ func Load() Config {
 		CookieMaxAge:   getInt("COOKIE_MAX_AGE", 7*24*3600),
 		DBDSN:          get("DB_DSN", "harmonia:harmonia@tcp(localhost:3306)/harmonia?parseTime=true"),
 		RedisAddr:      get("REDIS_ADDR", "localhost:6379"),
-		SessionBackend: get("SESSION_BACKEND", "redis"),
+		SessionBackend: get("SESSION_BACKEND", "memory"), // or "redis"
 	}
 }
