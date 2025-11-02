@@ -41,8 +41,8 @@ func RegisterRoutes(
 	logicParent := api.Group("", auth.RequireAuth(cfg.CookieName, sessStore))
 
 	// Features
-	engine.Register(engineParent, engSvc)
-	logic.Register(logicParent, lgSvc)
+	engine.Register(engineParent, engine.NewController(engSvc))
+	logic.Register(logicParent, logic.NewController(lgSvc))
 
 	// Swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -205,6 +205,165 @@
                 }
             }
         },
+        "/engine/matmul": {
+            "post": {
+                "description": "Calls EngineService.MatMul with two matrices A and B",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "engine"
+                ],
+                "summary": "Matrix multiply",
+                "parameters": [
+                    {
+                        "description": "A and B matrices",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/engine.MatMulDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/engine/pi": {
+            "post": {
+                "description": "Calls EngineService.EstimatePi with given sample size",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "engine"
+                ],
+                "summary": "Estimate π via Monte Carlo",
+                "parameters": [
+                    {
+                        "description": "Pi input",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/engine.PiDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/engine/stats": {
+            "post": {
+                "description": "Calls EngineService.ComputeStats on a dataset (sample variance by default)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "engine"
+                ],
+                "summary": "Compute vector statistics",
+                "parameters": [
+                    {
+                        "description": "Stats input",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/engine.StatsDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/healthz": {
             "get": {
                 "description": "Liveness/readiness probe endpoint",
@@ -241,6 +400,59 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/logic/eval": {
+            "post": {
+                "description": "Evaluate a numeric expression with optional variables via LogicService.Evaluate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logic"
+                ],
+                "summary": "Evaluate expression",
+                "parameters": [
+                    {
+                        "description": "Eval input",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/logic.EvalDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -291,6 +503,112 @@
                     }
                 }
             }
+        },
+        "/logic/plan": {
+            "post": {
+                "description": "Generate a step plan from a goal (+ optional hints) via LogicService.PlanTasks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logic"
+                ],
+                "summary": "Create a task plan",
+                "parameters": [
+                    {
+                        "description": "Plan input",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/logic.PlanDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/logic/transform": {
+            "post": {
+                "description": "Apply MAP/FILTER/SUM with an optional expression/var on numeric data via LogicService.Transform",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logic"
+                ],
+                "summary": "Transform dataset",
+                "parameters": [
+                    {
+                        "description": "Transform input",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/logic.TransformDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -316,6 +634,143 @@
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "engine.MatMulDTO": {
+            "type": "object",
+            "required": [
+                "a",
+                "b"
+            ],
+            "properties": {
+                "a": {
+                    "$ref": "#/definitions/engine.MatrixDTO"
+                },
+                "b": {
+                    "$ref": "#/definitions/engine.MatrixDTO"
+                }
+            }
+        },
+        "engine.MatrixDTO": {
+            "type": "object",
+            "required": [
+                "cols",
+                "data",
+                "rows"
+            ],
+            "properties": {
+                "cols": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "rows": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "engine.PiDTO": {
+            "type": "object",
+            "required": [
+                "samples"
+            ],
+            "properties": {
+                "samples": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "engine.StatsDTO": {
+            "type": "object",
+            "required": [
+                "data"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "sample": {
+                    "description": "optional; default to true if nil",
+                    "type": "boolean"
+                }
+            }
+        },
+        "logic.EvalDTO": {
+            "type": "object",
+            "required": [
+                "expression"
+            ],
+            "properties": {
+                "expression": {
+                    "type": "string"
+                },
+                "variables": {
+                    "description": "optional",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number",
+                        "format": "float64"
+                    }
+                }
+            }
+        },
+        "logic.PlanDTO": {
+            "type": "object",
+            "required": [
+                "goal"
+            ],
+            "properties": {
+                "goal": {
+                    "type": "string"
+                },
+                "hints": {
+                    "description": "optional",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "max_steps": {
+                    "description": "optional",
+                    "type": "integer"
+                }
+            }
+        },
+        "logic.TransformDTO": {
+            "type": "object",
+            "required": [
+                "data",
+                "op"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "expr": {
+                    "description": "optional",
+                    "type": "string"
+                },
+                "op": {
+                    "description": "\"MAP\" | \"FILTER\" | \"SUM\" (case-insensitive) or number",
+                    "type": "string"
+                },
+                "var_name": {
+                    "description": "optional",
                     "type": "string"
                 }
             }

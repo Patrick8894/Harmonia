@@ -40,7 +40,7 @@ type registerReq struct {
 
 func (a *Controller) Register(rg *gin.RouterGroup) {
 	g := rg.Group("/auth")
-	g.POST("/register", a.RegisterUser) // <-- new
+	g.POST("/register", a.RegisterUser)
 	g.POST("/login", a.Login)
 	g.POST("/logout", a.Logout)
 	g.GET("/me", a.Me)

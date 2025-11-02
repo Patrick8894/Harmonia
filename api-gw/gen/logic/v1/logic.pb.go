@@ -21,6 +21,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type TransformOp int32
+
+const (
+	TransformOp_TRANSFORM_OP_UNSPECIFIED TransformOp = 0
+	TransformOp_MAP                      TransformOp = 1
+	TransformOp_FILTER                   TransformOp = 2
+	TransformOp_SUM                      TransformOp = 3
+)
+
+// Enum value maps for TransformOp.
+var (
+	TransformOp_name = map[int32]string{
+		0: "TRANSFORM_OP_UNSPECIFIED",
+		1: "MAP",
+		2: "FILTER",
+		3: "SUM",
+	}
+	TransformOp_value = map[string]int32{
+		"TRANSFORM_OP_UNSPECIFIED": 0,
+		"MAP":                      1,
+		"FILTER":                   2,
+		"SUM":                      3,
+	}
+)
+
+func (x TransformOp) Enum() *TransformOp {
+	p := new(TransformOp)
+	*p = x
+	return p
+}
+
+func (x TransformOp) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TransformOp) Descriptor() protoreflect.EnumDescriptor {
+	return file_logic_proto_enumTypes[0].Descriptor()
+}
+
+func (TransformOp) Type() protoreflect.EnumType {
+	return &file_logic_proto_enumTypes[0]
+}
+
+func (x TransformOp) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TransformOp.Descriptor instead.
+func (TransformOp) EnumDescriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{0}
+}
+
 type HelloRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -109,6 +161,442 @@ func (x *HelloReply) GetMessage() string {
 	return ""
 }
 
+type EvalRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Expression    string                 `protobuf:"bytes,1,opt,name=expression,proto3" json:"expression,omitempty"`
+	Variables     map[string]float64     `protobuf:"bytes,2,rep,name=variables,proto3" json:"variables,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"fixed64,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EvalRequest) Reset() {
+	*x = EvalRequest{}
+	mi := &file_logic_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EvalRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EvalRequest) ProtoMessage() {}
+
+func (x *EvalRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_logic_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EvalRequest.ProtoReflect.Descriptor instead.
+func (*EvalRequest) Descriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *EvalRequest) GetExpression() string {
+	if x != nil {
+		return x.Expression
+	}
+	return ""
+}
+
+func (x *EvalRequest) GetVariables() map[string]float64 {
+	if x != nil {
+		return x.Variables
+	}
+	return nil
+}
+
+type EvalReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        float64                `protobuf:"fixed64,1,opt,name=result,proto3" json:"result,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EvalReply) Reset() {
+	*x = EvalReply{}
+	mi := &file_logic_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EvalReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EvalReply) ProtoMessage() {}
+
+func (x *EvalReply) ProtoReflect() protoreflect.Message {
+	mi := &file_logic_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EvalReply.ProtoReflect.Descriptor instead.
+func (*EvalReply) Descriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *EvalReply) GetResult() float64 {
+	if x != nil {
+		return x.Result
+	}
+	return 0
+}
+
+func (x *EvalReply) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+type TransformRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []float64              `protobuf:"fixed64,1,rep,packed,name=data,proto3" json:"data,omitempty"`
+	Expr          string                 `protobuf:"bytes,2,opt,name=expr,proto3" json:"expr,omitempty"`
+	VarName       string                 `protobuf:"bytes,3,opt,name=var_name,json=varName,proto3" json:"var_name,omitempty"`
+	Op            TransformOp            `protobuf:"varint,4,opt,name=op,proto3,enum=reco.v1.TransformOp" json:"op,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TransformRequest) Reset() {
+	*x = TransformRequest{}
+	mi := &file_logic_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TransformRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TransformRequest) ProtoMessage() {}
+
+func (x *TransformRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_logic_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TransformRequest.ProtoReflect.Descriptor instead.
+func (*TransformRequest) Descriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *TransformRequest) GetData() []float64 {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *TransformRequest) GetExpr() string {
+	if x != nil {
+		return x.Expr
+	}
+	return ""
+}
+
+func (x *TransformRequest) GetVarName() string {
+	if x != nil {
+		return x.VarName
+	}
+	return ""
+}
+
+func (x *TransformRequest) GetOp() TransformOp {
+	if x != nil {
+		return x.Op
+	}
+	return TransformOp_TRANSFORM_OP_UNSPECIFIED
+}
+
+type TransformReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []float64              `protobuf:"fixed64,1,rep,packed,name=data,proto3" json:"data,omitempty"`
+	Result        float64                `protobuf:"fixed64,2,opt,name=result,proto3" json:"result,omitempty"`
+	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TransformReply) Reset() {
+	*x = TransformReply{}
+	mi := &file_logic_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TransformReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TransformReply) ProtoMessage() {}
+
+func (x *TransformReply) ProtoReflect() protoreflect.Message {
+	mi := &file_logic_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TransformReply.ProtoReflect.Descriptor instead.
+func (*TransformReply) Descriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TransformReply) GetData() []float64 {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *TransformReply) GetResult() float64 {
+	if x != nil {
+		return x.Result
+	}
+	return 0
+}
+
+func (x *TransformReply) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+type PlanRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Goal          string                 `protobuf:"bytes,1,opt,name=goal,proto3" json:"goal,omitempty"`
+	Hints         []string               `protobuf:"bytes,2,rep,name=hints,proto3" json:"hints,omitempty"`
+	MaxSteps      int32                  `protobuf:"varint,3,opt,name=max_steps,json=maxSteps,proto3" json:"max_steps,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlanRequest) Reset() {
+	*x = PlanRequest{}
+	mi := &file_logic_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlanRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlanRequest) ProtoMessage() {}
+
+func (x *PlanRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_logic_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlanRequest.ProtoReflect.Descriptor instead.
+func (*PlanRequest) Descriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *PlanRequest) GetGoal() string {
+	if x != nil {
+		return x.Goal
+	}
+	return ""
+}
+
+func (x *PlanRequest) GetHints() []string {
+	if x != nil {
+		return x.Hints
+	}
+	return nil
+}
+
+func (x *PlanRequest) GetMaxSteps() int32 {
+	if x != nil {
+		return x.MaxSteps
+	}
+	return 0
+}
+
+type Task struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Detail        string                 `protobuf:"bytes,3,opt,name=detail,proto3" json:"detail,omitempty"`
+	Priority      int32                  `protobuf:"varint,4,opt,name=priority,proto3" json:"priority,omitempty"`
+	EstimateMin   int32                  `protobuf:"varint,5,opt,name=estimate_min,json=estimateMin,proto3" json:"estimate_min,omitempty"`
+	DependsOn     []string               `protobuf:"bytes,6,rep,name=depends_on,json=dependsOn,proto3" json:"depends_on,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Task) Reset() {
+	*x = Task{}
+	mi := &file_logic_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Task) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Task) ProtoMessage() {}
+
+func (x *Task) ProtoReflect() protoreflect.Message {
+	mi := &file_logic_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Task.ProtoReflect.Descriptor instead.
+func (*Task) Descriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *Task) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Task) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *Task) GetDetail() string {
+	if x != nil {
+		return x.Detail
+	}
+	return ""
+}
+
+func (x *Task) GetPriority() int32 {
+	if x != nil {
+		return x.Priority
+	}
+	return 0
+}
+
+func (x *Task) GetEstimateMin() int32 {
+	if x != nil {
+		return x.EstimateMin
+	}
+	return 0
+}
+
+func (x *Task) GetDependsOn() []string {
+	if x != nil {
+		return x.DependsOn
+	}
+	return nil
+}
+
+type PlanReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Tasks         []*Task                `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	Notes         string                 `protobuf:"bytes,2,opt,name=notes,proto3" json:"notes,omitempty"`
+	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlanReply) Reset() {
+	*x = PlanReply{}
+	mi := &file_logic_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlanReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlanReply) ProtoMessage() {}
+
+func (x *PlanReply) ProtoReflect() protoreflect.Message {
+	mi := &file_logic_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlanReply.ProtoReflect.Descriptor instead.
+func (*PlanReply) Descriptor() ([]byte, []int) {
+	return file_logic_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *PlanReply) GetTasks() []*Task {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+func (x *PlanReply) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
+}
+
+func (x *PlanReply) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
 var File_logic_proto protoreflect.FileDescriptor
 
 const file_logic_proto_rawDesc = "" +
@@ -118,9 +606,54 @@ const file_logic_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"&\n" +
 	"\n" +
 	"HelloReply\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2E\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xae\x01\n" +
+	"\vEvalRequest\x12\x1e\n" +
+	"\n" +
+	"expression\x18\x01 \x01(\tR\n" +
+	"expression\x12A\n" +
+	"\tvariables\x18\x02 \x03(\v2#.reco.v1.EvalRequest.VariablesEntryR\tvariables\x1a<\n" +
+	"\x0eVariablesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x01R\x05value:\x028\x01\"9\n" +
+	"\tEvalReply\x12\x16\n" +
+	"\x06result\x18\x01 \x01(\x01R\x06result\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error\"{\n" +
+	"\x10TransformRequest\x12\x12\n" +
+	"\x04data\x18\x01 \x03(\x01R\x04data\x12\x12\n" +
+	"\x04expr\x18\x02 \x01(\tR\x04expr\x12\x19\n" +
+	"\bvar_name\x18\x03 \x01(\tR\avarName\x12$\n" +
+	"\x02op\x18\x04 \x01(\x0e2\x14.reco.v1.TransformOpR\x02op\"R\n" +
+	"\x0eTransformReply\x12\x12\n" +
+	"\x04data\x18\x01 \x03(\x01R\x04data\x12\x16\n" +
+	"\x06result\x18\x02 \x01(\x01R\x06result\x12\x14\n" +
+	"\x05error\x18\x03 \x01(\tR\x05error\"T\n" +
+	"\vPlanRequest\x12\x12\n" +
+	"\x04goal\x18\x01 \x01(\tR\x04goal\x12\x14\n" +
+	"\x05hints\x18\x02 \x03(\tR\x05hints\x12\x1b\n" +
+	"\tmax_steps\x18\x03 \x01(\x05R\bmaxSteps\"\xa2\x01\n" +
+	"\x04Task\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x16\n" +
+	"\x06detail\x18\x03 \x01(\tR\x06detail\x12\x1a\n" +
+	"\bpriority\x18\x04 \x01(\x05R\bpriority\x12!\n" +
+	"\festimate_min\x18\x05 \x01(\x05R\vestimateMin\x12\x1d\n" +
+	"\n" +
+	"depends_on\x18\x06 \x03(\tR\tdependsOn\"\\\n" +
+	"\tPlanReply\x12#\n" +
+	"\x05tasks\x18\x01 \x03(\v2\r.reco.v1.TaskR\x05tasks\x12\x14\n" +
+	"\x05notes\x18\x02 \x01(\tR\x05notes\x12\x14\n" +
+	"\x05error\x18\x03 \x01(\tR\x05error*I\n" +
+	"\vTransformOp\x12\x1c\n" +
+	"\x18TRANSFORM_OP_UNSPECIFIED\x10\x00\x12\a\n" +
+	"\x03MAP\x10\x01\x12\n" +
+	"\n" +
+	"\x06FILTER\x10\x02\x12\a\n" +
+	"\x03SUM\x10\x032\xf9\x01\n" +
 	"\fLogicService\x125\n" +
-	"\x05Hello\x12\x15.reco.v1.HelloRequest\x1a\x13.reco.v1.HelloReply\"\x00B=Z;github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1b\x06proto3"
+	"\x05Hello\x12\x15.reco.v1.HelloRequest\x1a\x13.reco.v1.HelloReply\"\x00\x126\n" +
+	"\bEvaluate\x12\x14.reco.v1.EvalRequest\x1a\x12.reco.v1.EvalReply\"\x00\x12A\n" +
+	"\tTransform\x12\x19.reco.v1.TransformRequest\x1a\x17.reco.v1.TransformReply\"\x00\x127\n" +
+	"\tPlanTasks\x12\x14.reco.v1.PlanRequest\x1a\x12.reco.v1.PlanReply\"\x00B=Z;github.com/Patrick8894/harmonia/api-gw/gen/logic/v1;logicv1b\x06proto3"
 
 var (
 	file_logic_proto_rawDescOnce sync.Once
@@ -134,19 +667,38 @@ func file_logic_proto_rawDescGZIP() []byte {
 	return file_logic_proto_rawDescData
 }
 
-var file_logic_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_logic_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_logic_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_logic_proto_goTypes = []any{
-	(*HelloRequest)(nil), // 0: reco.v1.HelloRequest
-	(*HelloReply)(nil),   // 1: reco.v1.HelloReply
+	(TransformOp)(0),         // 0: reco.v1.TransformOp
+	(*HelloRequest)(nil),     // 1: reco.v1.HelloRequest
+	(*HelloReply)(nil),       // 2: reco.v1.HelloReply
+	(*EvalRequest)(nil),      // 3: reco.v1.EvalRequest
+	(*EvalReply)(nil),        // 4: reco.v1.EvalReply
+	(*TransformRequest)(nil), // 5: reco.v1.TransformRequest
+	(*TransformReply)(nil),   // 6: reco.v1.TransformReply
+	(*PlanRequest)(nil),      // 7: reco.v1.PlanRequest
+	(*Task)(nil),             // 8: reco.v1.Task
+	(*PlanReply)(nil),        // 9: reco.v1.PlanReply
+	nil,                      // 10: reco.v1.EvalRequest.VariablesEntry
 }
 var file_logic_proto_depIdxs = []int32{
-	0, // 0: reco.v1.LogicService.Hello:input_type -> reco.v1.HelloRequest
-	1, // 1: reco.v1.LogicService.Hello:output_type -> reco.v1.HelloReply
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	10, // 0: reco.v1.EvalRequest.variables:type_name -> reco.v1.EvalRequest.VariablesEntry
+	0,  // 1: reco.v1.TransformRequest.op:type_name -> reco.v1.TransformOp
+	8,  // 2: reco.v1.PlanReply.tasks:type_name -> reco.v1.Task
+	1,  // 3: reco.v1.LogicService.Hello:input_type -> reco.v1.HelloRequest
+	3,  // 4: reco.v1.LogicService.Evaluate:input_type -> reco.v1.EvalRequest
+	5,  // 5: reco.v1.LogicService.Transform:input_type -> reco.v1.TransformRequest
+	7,  // 6: reco.v1.LogicService.PlanTasks:input_type -> reco.v1.PlanRequest
+	2,  // 7: reco.v1.LogicService.Hello:output_type -> reco.v1.HelloReply
+	4,  // 8: reco.v1.LogicService.Evaluate:output_type -> reco.v1.EvalReply
+	6,  // 9: reco.v1.LogicService.Transform:output_type -> reco.v1.TransformReply
+	9,  // 10: reco.v1.LogicService.PlanTasks:output_type -> reco.v1.PlanReply
+	7,  // [7:11] is the sub-list for method output_type
+	3,  // [3:7] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_logic_proto_init() }
@@ -159,13 +711,14 @@ func file_logic_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_logic_proto_rawDesc), len(file_logic_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      1,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_logic_proto_goTypes,
 		DependencyIndexes: file_logic_proto_depIdxs,
+		EnumInfos:         file_logic_proto_enumTypes,
 		MessageInfos:      file_logic_proto_msgTypes,
 	}.Build()
 	File_logic_proto = out.File

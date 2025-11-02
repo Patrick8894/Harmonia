@@ -17,6 +17,100 @@ definitions:
     - password
     - username
     type: object
+  engine.MatMulDTO:
+    properties:
+      a:
+        $ref: '#/definitions/engine.MatrixDTO'
+      b:
+        $ref: '#/definitions/engine.MatrixDTO'
+    required:
+    - a
+    - b
+    type: object
+  engine.MatrixDTO:
+    properties:
+      cols:
+        minimum: 1
+        type: integer
+      data:
+        items:
+          type: number
+        type: array
+      rows:
+        minimum: 1
+        type: integer
+    required:
+    - cols
+    - data
+    - rows
+    type: object
+  engine.PiDTO:
+    properties:
+      samples:
+        minimum: 1
+        type: integer
+    required:
+    - samples
+    type: object
+  engine.StatsDTO:
+    properties:
+      data:
+        items:
+          type: number
+        type: array
+      sample:
+        description: optional; default to true if nil
+        type: boolean
+    required:
+    - data
+    type: object
+  logic.EvalDTO:
+    properties:
+      expression:
+        type: string
+      variables:
+        additionalProperties:
+          format: float64
+          type: number
+        description: optional
+        type: object
+    required:
+    - expression
+    type: object
+  logic.PlanDTO:
+    properties:
+      goal:
+        type: string
+      hints:
+        description: optional
+        items:
+          type: string
+        type: array
+      max_steps:
+        description: optional
+        type: integer
+    required:
+    - goal
+    type: object
+  logic.TransformDTO:
+    properties:
+      data:
+        items:
+          type: number
+        type: array
+      expr:
+        description: optional
+        type: string
+      op:
+        description: '"MAP" | "FILTER" | "SUM" (case-insensitive) or number'
+        type: string
+      var_name:
+        description: optional
+        type: string
+    required:
+    - data
+    - op
+    type: object
 info:
   contact: {}
   description: REST gateway for the Harmonia project. Orchestrates Python (gRPC) and
@@ -154,6 +248,112 @@ paths:
       summary: Call C++ EngineService Hello RPC
       tags:
       - engine
+  /engine/matmul:
+    post:
+      consumes:
+      - application/json
+      description: Calls EngineService.MatMul with two matrices A and B
+      parameters:
+      - description: A and B matrices
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/engine.MatMulDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Matrix multiply
+      tags:
+      - engine
+  /engine/pi:
+    post:
+      consumes:
+      - application/json
+      description: Calls EngineService.EstimatePi with given sample size
+      parameters:
+      - description: Pi input
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/engine.PiDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Estimate π via Monte Carlo
+      tags:
+      - engine
+  /engine/stats:
+    post:
+      consumes:
+      - application/json
+      description: Calls EngineService.ComputeStats on a dataset (sample variance
+        by default)
+      parameters:
+      - description: Stats input
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/engine.StatsDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Compute vector statistics
+      tags:
+      - engine
   /healthz:
     get:
       description: Liveness/readiness probe endpoint
@@ -184,6 +384,41 @@ paths:
       summary: Hello endpoint
       tags:
       - root
+  /logic/eval:
+    post:
+      consumes:
+      - application/json
+      description: Evaluate a numeric expression with optional variables via LogicService.Evaluate
+      parameters:
+      - description: Eval input
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/logic.EvalDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Evaluate expression
+      tags:
+      - logic
   /logic/hello:
     get:
       description: Triggers the Hello RPC on the Python gRPC LogicService
@@ -209,6 +444,77 @@ paths:
               type: string
             type: object
       summary: Call Python LogicService Hello RPC
+      tags:
+      - logic
+  /logic/plan:
+    post:
+      consumes:
+      - application/json
+      description: Generate a step plan from a goal (+ optional hints) via LogicService.PlanTasks
+      parameters:
+      - description: Plan input
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/logic.PlanDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a task plan
+      tags:
+      - logic
+  /logic/transform:
+    post:
+      consumes:
+      - application/json
+      description: Apply MAP/FILTER/SUM with an optional expression/var on numeric
+        data via LogicService.Transform
+      parameters:
+      - description: Transform input
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/logic.TransformDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Transform dataset
       tags:
       - logic
 swagger: "2.0"

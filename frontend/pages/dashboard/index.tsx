@@ -50,97 +50,199 @@ export default function Dashboard() {
     setTabValue(newValue);
   };
 
-  // Define your API endpoints here
+  // Python Logic Service APIs
   const logicApis = [
     {
       title: 'Hello Logic',
       endpoint: '/api/logic/hello',
+      method: 'GET' as const,
       description: 'Simple greeting endpoint from Python logic service',
       language: 'Python' as const,
       parameters: [
         {
           name: 'name',
-          type: 'string',
+          type: 'string' as const,
           required: false,
-          defaultValue: user || 'Patrick',
+          defaultValue: user || 'World',
           description: 'Name to greet'
         }
       ]
     },
     {
-      title: 'Data Processing',
-      endpoint: '/api/logic/process',
-      description: 'Process and transform data using Python workflows',
+      title: 'Evaluate Expression',
+      endpoint: '/api/logic/eval',
+      method: 'POST' as const,
+      description: 'Evaluate a numeric expression with optional variables',
       language: 'Python' as const,
-      parameters: [
+      bodyParameters: [
+        {
+          name: 'expression',
+          type: 'string' as const,
+          required: true,
+          placeholder: '2 * x + 3',
+          description: 'Mathematical expression to evaluate'
+        },
+        {
+          name: 'variables',
+          type: 'object' as const,
+          required: false,
+          placeholder: '{"x": 5}',
+          description: 'Variables for the expression (JSON object)'
+        }
+      ]
+    },
+    {
+      title: 'Transform Dataset',
+      endpoint: '/api/logic/transform',
+      method: 'POST' as const,
+      description: 'Apply MAP/FILTER/SUM operations on numeric data',
+      language: 'Python' as const,
+      bodyParameters: [
         {
           name: 'data',
-          type: 'string',
+          type: 'array' as const,
           required: true,
-          description: 'Input data to process'
+          placeholder: '[1, 2, 3, 4, 5]',
+          description: 'Input data array'
         },
         {
           name: 'operation',
-          type: 'string',
+          type: 'string' as const,
+          required: true,
+          defaultValue: 'MAP',
+          placeholder: 'MAP, FILTER, or SUM',
+          description: 'Operation type'
+        },
+        {
+          name: 'expression',
+          type: 'string' as const,
           required: false,
-          defaultValue: 'transform',
-          description: 'Operation type (transform, validate, analyze)'
+          placeholder: 'x * 2',
+          description: 'Expression for MAP/FILTER'
+        },
+        {
+          name: 'var_name',
+          type: 'string' as const,
+          required: false,
+          defaultValue: 'x',
+          description: 'Variable name in expression'
+        }
+      ]
+    },
+    {
+      title: 'Plan Tasks',
+      endpoint: '/api/logic/plan',
+      method: 'POST' as const,
+      description: 'Generate a step-by-step plan from a goal',
+      language: 'Python' as const,
+      bodyParameters: [
+        {
+          name: 'goal',
+          type: 'string' as const,
+          required: true,
+          placeholder: 'Build a web application',
+          description: 'Goal to create a plan for'
+        },
+        {
+          name: 'hints',
+          type: 'array' as const,
+          required: false,
+          placeholder: '["Use React", "Deploy to AWS"]',
+          description: 'Optional hints for planning'
         }
       ]
     }
   ];
 
+  // C++ Engine APIs
   const engineApis = [
     {
       title: 'Hello Engine',
       endpoint: '/api/engine/hello',
+      method: 'GET' as const,
       description: 'High-performance greeting from C++ compute engine',
       language: 'C++' as const,
       parameters: [
         {
           name: 'name',
-          type: 'string',
+          type: 'string' as const,
           required: false,
-          defaultValue: user || 'Patrick',
+          defaultValue: user || 'World',
           description: 'Name to greet'
         }
       ]
     },
     {
-      title: 'Matrix Computation',
-      endpoint: '/api/engine/compute',
-      description: 'Perform intensive numerical computations',
+      title: 'Estimate Pi (Monte Carlo)',
+      endpoint: '/api/engine/pi',
+      method: 'POST' as const,
+      description: 'Estimate π using Monte Carlo simulation',
       language: 'C++' as const,
-      parameters: [
+      bodyParameters: [
         {
-          name: 'size',
-          type: 'number',
+          name: 'samples',
+          type: 'number' as const,
           required: true,
-          defaultValue: '100',
-          description: 'Matrix size (NxN)'
+          defaultValue: 1000000,
+          description: 'Number of random samples'
+        }
+      ]
+    },
+    {
+      title: 'Matrix Multiplication',
+      endpoint: '/api/engine/matmul',
+      method: 'POST' as const,
+      description: 'Multiply two matrices A and B',
+      language: 'C++' as const,
+      bodyParameters: [
+        {
+          name: 'A',
+          type: 'object' as const,
+          required: true,
+          placeholder: '{"rows": 2, "cols": 2, "data": [1, 2, 3, 4]}',
+          description: 'Matrix A (rows × cols)'
         },
         {
-          name: 'iterations',
-          type: 'number',
+          name: 'B',
+          type: 'object' as const,
+          required: true,
+          placeholder: '{"rows": 2, "cols": 2, "data": [5, 6, 7, 8]}',
+          description: 'Matrix B (cols must match A.cols)'
+        }
+      ]
+    },
+    {
+      title: 'Compute Statistics',
+      endpoint: '/api/engine/stats',
+      method: 'POST' as const,
+      description: 'Calculate mean, variance, stddev, min, max of a dataset',
+      language: 'C++' as const,
+      bodyParameters: [
+        {
+          name: 'data',
+          type: 'array' as const,
+          required: true,
+          placeholder: '[1.5, 2.3, 4.7, 3.2, 5.1]',
+          description: 'Numeric dataset'
+        },
+        {
+          name: 'sample',
+          type: 'boolean' as const,
           required: false,
-          defaultValue: '1000',
-          description: 'Number of iterations'
+          defaultValue: true,
+          description: 'Use sample variance (n-1) instead of population variance'
         }
       ]
     }
   ];
 
+  // Go Gateway APIs
   const gatewayApis = [
     {
       title: 'Health Check',
       endpoint: '/api/hello',
+      method: 'GET' as const,
       description: 'Gateway health check and system status',
-      language: 'Go' as const
-    },
-    {
-      title: 'System Metrics',
-      endpoint: '/api/metrics',
-      description: 'Real-time system performance metrics',
       language: 'Go' as const
     }
   ];
@@ -241,7 +343,7 @@ export default function Dashboard() {
               </Stack>
               <Grid container spacing={3}>
                 {logicApis.map((api, index) => (
-                  <Grid key={index} size={{ xs: 12, md: 6 }}>
+                  <Grid key={index} size={{ xs: 12, lg: 6 }}>
                     <ApiEndpointCard {...api} />
                   </Grid>
                 ))}
@@ -259,7 +361,7 @@ export default function Dashboard() {
               </Stack>
               <Grid container spacing={3}>
                 {engineApis.map((api, index) => (
-                  <Grid key={index} size={{ xs: 12, md: 6 }}>
+                  <Grid key={index} size={{ xs: 12, lg: 6 }}>
                     <ApiEndpointCard {...api} />
                   </Grid>
                 ))}
@@ -277,7 +379,7 @@ export default function Dashboard() {
               </Stack>
               <Grid container spacing={3}>
                 {gatewayApis.map((api, index) => (
-                  <Grid key={index} size={{ xs: 12, md: 6 }}>
+                  <Grid key={index} size={{ xs: 12, lg: 6 }}>
                     <ApiEndpointCard {...api} />
                   </Grid>
                 ))}

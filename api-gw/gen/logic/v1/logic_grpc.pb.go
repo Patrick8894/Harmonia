@@ -19,16 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LogicService_Hello_FullMethodName = "/reco.v1.LogicService/Hello"
+	LogicService_Hello_FullMethodName     = "/reco.v1.LogicService/Hello"
+	LogicService_Evaluate_FullMethodName  = "/reco.v1.LogicService/Evaluate"
+	LogicService_Transform_FullMethodName = "/reco.v1.LogicService/Transform"
+	LogicService_PlanTasks_FullMethodName = "/reco.v1.LogicService/PlanTasks"
 )
 
 // LogicServiceClient is the client API for LogicService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Simple logic service to prove the pipe
 type LogicServiceClient interface {
 	Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
+	Evaluate(ctx context.Context, in *EvalRequest, opts ...grpc.CallOption) (*EvalReply, error)
+	Transform(ctx context.Context, in *TransformRequest, opts ...grpc.CallOption) (*TransformReply, error)
+	PlanTasks(ctx context.Context, in *PlanRequest, opts ...grpc.CallOption) (*PlanReply, error)
 }
 
 type logicServiceClient struct {
@@ -49,13 +53,44 @@ func (c *logicServiceClient) Hello(ctx context.Context, in *HelloRequest, opts .
 	return out, nil
 }
 
+func (c *logicServiceClient) Evaluate(ctx context.Context, in *EvalRequest, opts ...grpc.CallOption) (*EvalReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EvalReply)
+	err := c.cc.Invoke(ctx, LogicService_Evaluate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *logicServiceClient) Transform(ctx context.Context, in *TransformRequest, opts ...grpc.CallOption) (*TransformReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TransformReply)
+	err := c.cc.Invoke(ctx, LogicService_Transform_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *logicServiceClient) PlanTasks(ctx context.Context, in *PlanRequest, opts ...grpc.CallOption) (*PlanReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlanReply)
+	err := c.cc.Invoke(ctx, LogicService_PlanTasks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LogicServiceServer is the server API for LogicService service.
 // All implementations must embed UnimplementedLogicServiceServer
 // for forward compatibility.
-//
-// Simple logic service to prove the pipe
 type LogicServiceServer interface {
 	Hello(context.Context, *HelloRequest) (*HelloReply, error)
+	Evaluate(context.Context, *EvalRequest) (*EvalReply, error)
+	Transform(context.Context, *TransformRequest) (*TransformReply, error)
+	PlanTasks(context.Context, *PlanRequest) (*PlanReply, error)
 	mustEmbedUnimplementedLogicServiceServer()
 }
 
@@ -68,6 +103,15 @@ type UnimplementedLogicServiceServer struct{}
 
 func (UnimplementedLogicServiceServer) Hello(context.Context, *HelloRequest) (*HelloReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+}
+func (UnimplementedLogicServiceServer) Evaluate(context.Context, *EvalRequest) (*EvalReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Evaluate not implemented")
+}
+func (UnimplementedLogicServiceServer) Transform(context.Context, *TransformRequest) (*TransformReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Transform not implemented")
+}
+func (UnimplementedLogicServiceServer) PlanTasks(context.Context, *PlanRequest) (*PlanReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlanTasks not implemented")
 }
 func (UnimplementedLogicServiceServer) mustEmbedUnimplementedLogicServiceServer() {}
 func (UnimplementedLogicServiceServer) testEmbeddedByValue()                      {}
@@ -108,6 +152,60 @@ func _LogicService_Hello_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LogicService_Evaluate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EvalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogicServiceServer).Evaluate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LogicService_Evaluate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogicServiceServer).Evaluate(ctx, req.(*EvalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LogicService_Transform_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransformRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogicServiceServer).Transform(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LogicService_Transform_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogicServiceServer).Transform(ctx, req.(*TransformRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LogicService_PlanTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogicServiceServer).PlanTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LogicService_PlanTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogicServiceServer).PlanTasks(ctx, req.(*PlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LogicService_ServiceDesc is the grpc.ServiceDesc for LogicService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -118,6 +216,18 @@ var LogicService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Hello",
 			Handler:    _LogicService_Hello_Handler,
+		},
+		{
+			MethodName: "Evaluate",
+			Handler:    _LogicService_Evaluate_Handler,
+		},
+		{
+			MethodName: "Transform",
+			Handler:    _LogicService_Transform_Handler,
+		},
+		{
+			MethodName: "PlanTasks",
+			Handler:    _LogicService_PlanTasks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

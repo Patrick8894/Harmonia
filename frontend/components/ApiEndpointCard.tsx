@@ -9,7 +9,9 @@ import {
   TextField,
   Box,
   Collapse,
-  Alert
+  Alert,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import {
   Launch as LaunchIcon,
@@ -19,10 +21,11 @@ import {
 
 interface ApiParameter {
   name: string;
-  type: string;
+  type: 'string' | 'number' | 'boolean' | 'array' | 'object';
   required: boolean;
-  defaultValue?: string;
+  defaultValue?: any;
   description?: string;
+  placeholder?: string;
 }
 
 interface ApiEndpointCardProps {
@@ -32,6 +35,7 @@ interface ApiEndpointCardProps {
   description: string;
   language: 'Go' | 'Python' | 'C++';
   parameters?: ApiParameter[];
+  bodyParameters?: ApiParameter[];
 }
 
 const languageColors = {
@@ -46,13 +50,20 @@ export default function ApiEndpointCard({
   method = 'GET',
   description,
   language,
-  parameters = []
+  parameters = [],
+  bodyParameters = []
 }: ApiEndpointCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const [paramValues, setParamValues] = useState<Record<string, string>>(
+  const [queryParams, setQueryParams] = useState<Record<string, string>>(
     parameters.reduce((acc, param) => ({
       ...acc,
       [param.name]: param.defaultValue || ''
+    }), {})
+  );
+  const [bodyParams, setBodyParams] = useState<Record<string, any>>(
+    bodyParameters.reduce((acc, param) => ({
+      ...acc,
+      [param.name]: param.defaultValue !== undefined ? param.defaultValue : ''
     }), {})
   );
   const [response, setResponse] = useState<string | null>(null);
@@ -62,13 +73,51 @@ export default function ApiEndpointCard({
   const buildUrl = () => {
     if (parameters.length === 0) return endpoint;
     
-    const queryParams = new URLSearchParams();
-    Object.entries(paramValues).forEach(([key, value]) => {
-      if (value) queryParams.append(key, value);
+    const queryParamsObj = new URLSearchParams();
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value) queryParamsObj.append(key, value);
     });
     
-    const queryString = queryParams.toString();
+    const queryString = queryParamsObj.toString();
     return queryString ? `${endpoint}?${queryString}` : endpoint;
+  };
+
+  const buildRequestBody = () => {
+    const body: Record<string, any> = {};
+    
+    bodyParameters.forEach((param) => {
+      const value = bodyParams[param.name];
+      
+      if (value === '' || value === null || value === undefined) {
+        if (param.required) {
+          body[param.name] = param.defaultValue || '';
+        }
+        return;
+      }
+
+      // Type conversion
+      if (param.type === 'number') {
+        body[param.name] = parseFloat(value);
+      } else if (param.type === 'boolean') {
+        body[param.name] = value;
+      } else if (param.type === 'array') {
+        try {
+          body[param.name] = typeof value === 'string' ? JSON.parse(value) : value;
+        } catch {
+          body[param.name] = [];
+        }
+      } else if (param.type === 'object') {
+        try {
+          body[param.name] = typeof value === 'string' ? JSON.parse(value) : value;
+        } catch {
+          body[param.name] = {};
+        }
+      } else {
+        body[param.name] = value;
+      }
+    });
+
+    return body;
   };
 
   const handleTest = async () => {
@@ -78,9 +127,27 @@ export default function ApiEndpointCard({
 
     try {
       const url = buildUrl();
-      const res = await fetch(url, { method });
-      const data = await res.text();
-      setResponse(data);
+      const options: RequestInit = {
+        method,
+        headers: method !== 'GET' ? { 'Content-Type': 'application/json' } : undefined,
+        body: method !== 'GET' ? JSON.stringify(buildRequestBody()) : undefined
+      };
+
+      const res = await fetch(url, options);
+      const contentType = res.headers.get('content-type');
+      
+      let data;
+      if (contentType?.includes('application/json')) {
+        data = await res.json();
+        setResponse(JSON.stringify(data, null, 2));
+      } else {
+        data = await res.text();
+        setResponse(data);
+      }
+
+      if (!res.ok) {
+        setError(`Request failed with status ${res.status}`);
+      }
     } catch (e: any) {
       setError(e?.message || 'Request failed');
     } finally {
@@ -88,14 +155,60 @@ export default function ApiEndpointCard({
     }
   };
 
-  const hasParameters = parameters.length > 0;
+  const hasParameters = parameters.length > 0 || bodyParameters.length > 0;
+  const canOpenDirectly = method === 'GET' && bodyParameters.length === 0;
+
+  const renderParameter = (param: ApiParameter, value: any, onChange: (val: any) => void) => {
+    if (param.type === 'boolean') {
+      return (
+        <FormControlLabel
+          key={param.name}
+          control={
+            <Switch
+              checked={value || false}
+              onChange={(e) => onChange(e.target.checked)}
+            />
+          }
+          label={
+            <Box>
+              <Typography variant="body2" fontWeight={600}>
+                {param.name} {param.required && <span style={{ color: 'red' }}>*</span>}
+              </Typography>
+              {param.description && (
+                <Typography variant="caption" color="text.secondary">
+                  {param.description}
+                </Typography>
+              )}
+            </Box>
+          }
+        />
+      );
+    }
+
+    return (
+      <TextField
+        key={param.name}
+        label={param.name}
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        size="small"
+        fullWidth
+        required={param.required}
+        helperText={param.description}
+        placeholder={param.placeholder || (param.type === 'array' ? '[1,2,3]' : param.type === 'object' ? '{"key":"value"}' : param.defaultValue?.toString())}
+        multiline={param.type === 'array' || param.type === 'object'}
+        rows={param.type === 'array' || param.type === 'object' ? 3 : 1}
+        type={param.type === 'number' ? 'number' : 'text'}
+      />
+    );
+  };
 
   return (
     <Card variant="outlined" sx={{ '&:hover': { boxShadow: 2 }, transition: 'box-shadow 0.2s' }}>
       <CardContent>
         <Stack spacing={2}>
           <Box>
-            <Stack direction="row" spacing={1} alignItems="center" mb={1}>
+            <Stack direction="row" spacing={1} alignItems="center" mb={1} flexWrap="wrap">
               <Typography variant="h6" fontWeight={600}>
                 {title}
               </Typography>
@@ -170,7 +283,7 @@ export default function ApiEndpointCard({
                   {loading ? 'Testing...' : 'Test API'}
                 </Button>
               </>
-            ) : (
+            ) : canOpenDirectly ? (
               <Button
                 variant="outlined"
                 size="small"
@@ -182,29 +295,61 @@ export default function ApiEndpointCard({
               >
                 Open in New Tab
               </Button>
+            ) : (
+              <Button
+                variant="contained"
+                size="small"
+                endIcon={<SendIcon />}
+                onClick={handleTest}
+                disabled={loading}
+                sx={{
+                  textTransform: 'none',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #5568d3 0%, #63428d 100%)',
+                  }
+                }}
+              >
+                {loading ? 'Testing...' : 'Test API'}
+              </Button>
             )}
           </Stack>
 
           {hasParameters && (
             <Collapse in={expanded}>
               <Stack spacing={2} sx={{ pt: 1 }}>
-                {parameters.map((param) => (
-                  <TextField
-                    key={param.name}
-                    label={param.name}
-                    value={paramValues[param.name] || ''}
-                    onChange={(e) =>
-                      setParamValues((prev) => ({
-                        ...prev,
-                        [param.name]: e.target.value
-                      }))
-                    }
-                    size="small"
-                    required={param.required}
-                    helperText={param.description}
-                    placeholder={param.defaultValue}
-                  />
-                ))}
+                {parameters.length > 0 && (
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={600} mb={1} color="text.secondary">
+                      Query Parameters
+                    </Typography>
+                    <Stack spacing={2}>
+                      {parameters.map((param) =>
+                        renderParameter(
+                          param,
+                          queryParams[param.name],
+                          (val) => setQueryParams((prev) => ({ ...prev, [param.name]: val }))
+                        )
+                      )}
+                    </Stack>
+                  </Box>
+                )}
+                {bodyParameters.length > 0 && (
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={600} mb={1} color="text.secondary">
+                      Request Body
+                    </Typography>
+                    <Stack spacing={2}>
+                      {bodyParameters.map((param) =>
+                        renderParameter(
+                          param,
+                          bodyParams[param.name],
+                          (val) => setBodyParams((prev) => ({ ...prev, [param.name]: val }))
+                        )
+                      )}
+                    </Stack>
+                  </Box>
+                )}
               </Stack>
             </Collapse>
           )}
@@ -221,7 +366,7 @@ export default function ApiEndpointCard({
                 bgcolor: 'grey.100',
                 p: 2,
                 borderRadius: 1,
-                maxHeight: 200,
+                maxHeight: 300,
                 overflow: 'auto'
               }}
             >

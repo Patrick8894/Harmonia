@@ -23,6 +23,9 @@ func Usage() {
   flag.PrintDefaults()
   fmt.Fprintln(os.Stderr, "\nFunctions:")
   fmt.Fprintln(os.Stderr, "  HelloReply Hello(HelloRequest req)")
+  fmt.Fprintln(os.Stderr, "  PiReply EstimatePi(PiRequest req)")
+  fmt.Fprintln(os.Stderr, "  MatReply MatMul(MatMulRequest req)")
+  fmt.Fprintln(os.Stderr, "  VectorStatsReply ComputeStats(VectorStatsRequest req)")
   fmt.Fprintln(os.Stderr)
   os.Exit(0)
 }
@@ -150,24 +153,99 @@ func main() {
       fmt.Fprintln(os.Stderr, "Hello requires 1 args")
       flag.Usage()
     }
-    arg6 := flag.Arg(1)
-    mbTrans7 := thrift.NewTMemoryBufferLen(len(arg6))
-    defer mbTrans7.Close()
-    _, err8 := mbTrans7.WriteString(arg6)
-    if err8 != nil {
+    arg22 := flag.Arg(1)
+    mbTrans23 := thrift.NewTMemoryBufferLen(len(arg22))
+    defer mbTrans23.Close()
+    _, err24 := mbTrans23.WriteString(arg22)
+    if err24 != nil {
       Usage()
       return
     }
-    factory9 := thrift.NewTJSONProtocolFactory()
-    jsProt10 := factory9.GetProtocol(mbTrans7)
+    factory25 := thrift.NewTJSONProtocolFactory()
+    jsProt26 := factory25.GetProtocol(mbTrans23)
     argvalue0 := engine.NewHelloRequest()
-    err11 := argvalue0.Read(context.Background(), jsProt10)
-    if err11 != nil {
+    err27 := argvalue0.Read(context.Background(), jsProt26)
+    if err27 != nil {
       Usage()
       return
     }
     value0 := argvalue0
     fmt.Print(client.Hello(context.Background(), value0))
+    fmt.Print("\n")
+    break
+  case "EstimatePi":
+    if flag.NArg() - 1 != 1 {
+      fmt.Fprintln(os.Stderr, "EstimatePi requires 1 args")
+      flag.Usage()
+    }
+    arg28 := flag.Arg(1)
+    mbTrans29 := thrift.NewTMemoryBufferLen(len(arg28))
+    defer mbTrans29.Close()
+    _, err30 := mbTrans29.WriteString(arg28)
+    if err30 != nil {
+      Usage()
+      return
+    }
+    factory31 := thrift.NewTJSONProtocolFactory()
+    jsProt32 := factory31.GetProtocol(mbTrans29)
+    argvalue0 := engine.NewPiRequest()
+    err33 := argvalue0.Read(context.Background(), jsProt32)
+    if err33 != nil {
+      Usage()
+      return
+    }
+    value0 := argvalue0
+    fmt.Print(client.EstimatePi(context.Background(), value0))
+    fmt.Print("\n")
+    break
+  case "MatMul":
+    if flag.NArg() - 1 != 1 {
+      fmt.Fprintln(os.Stderr, "MatMul requires 1 args")
+      flag.Usage()
+    }
+    arg34 := flag.Arg(1)
+    mbTrans35 := thrift.NewTMemoryBufferLen(len(arg34))
+    defer mbTrans35.Close()
+    _, err36 := mbTrans35.WriteString(arg34)
+    if err36 != nil {
+      Usage()
+      return
+    }
+    factory37 := thrift.NewTJSONProtocolFactory()
+    jsProt38 := factory37.GetProtocol(mbTrans35)
+    argvalue0 := engine.NewMatMulRequest()
+    err39 := argvalue0.Read(context.Background(), jsProt38)
+    if err39 != nil {
+      Usage()
+      return
+    }
+    value0 := argvalue0
+    fmt.Print(client.MatMul(context.Background(), value0))
+    fmt.Print("\n")
+    break
+  case "ComputeStats":
+    if flag.NArg() - 1 != 1 {
+      fmt.Fprintln(os.Stderr, "ComputeStats requires 1 args")
+      flag.Usage()
+    }
+    arg40 := flag.Arg(1)
+    mbTrans41 := thrift.NewTMemoryBufferLen(len(arg40))
+    defer mbTrans41.Close()
+    _, err42 := mbTrans41.WriteString(arg40)
+    if err42 != nil {
+      Usage()
+      return
+    }
+    factory43 := thrift.NewTJSONProtocolFactory()
+    jsProt44 := factory43.GetProtocol(mbTrans41)
+    argvalue0 := engine.NewVectorStatsRequest()
+    err45 := argvalue0.Read(context.Background(), jsProt44)
+    if err45 != nil {
+      Usage()
+      return
+    }
+    value0 := argvalue0
+    fmt.Print(client.ComputeStats(context.Background(), value0))
     fmt.Print("\n")
     break
   case "":
