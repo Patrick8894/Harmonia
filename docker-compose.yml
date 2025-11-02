@@ -57,7 +57,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "9101:9101"
-    command: ./build/engine
+    command: ./build/engine_server
 
   mysql:
     image: mysql:8.4

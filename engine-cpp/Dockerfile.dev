@@ -12,4 +12,4 @@ COPY . /app/engine-cpp
 RUN rm -rf build && mkdir build && cd build && cmake .. && make -j"$(nproc)"
 
 EXPOSE 9101
-CMD ["./build/engine"]
+CMD ["./build/engine_server"]
