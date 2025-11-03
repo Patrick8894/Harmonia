@@ -7,7 +7,7 @@ It harmonizes Go, Python, and C++ services into a unified system capable of coor
 
 ## 🧩 Overview
 - **Frontend:** React / Next.js dashboard (Material UI) for login, registration, home, and dashboard pages.
-- **Gateway:** Go (Gin) REST API orchestrator managing authentication (via cookies), routing, and aggregation.
+- **Gateway:** Go (Gin) REST API orchestrator managing authentication (via cookies), routing, aggregation, and pluggable caching for RPC results.
 - **Logic Service:** Python (gRPC) microservice handling expression evaluation, task planning, and data transformation.
 - **Compute Engine:** C++ (Thrift) microservice performing high-speed numerical, matrix, and statistical computations.
 - **Databases:** MySQL for persistent user/auth data, and Redis or in-memory map for session management.
@@ -25,7 +25,9 @@ React / Next.js (Material UI)
         └── Thrift ─▶ C++ Compute Engine
         │
         ▼
- MySQL + Redis / In-Memory Session Store
+ MySQL ──┬─ User/Auth Data
+         ├─ Redis / In‑Memory Session Store
+         └─ Redis / In‑Memory **RPC Result Cache**
 ```
 
 ---
@@ -33,7 +35,9 @@ React / Next.js (Material UI)
 ## 🚀 Key Features
 - **Cross-language orchestration:** Go ↔ Python (gRPC) ↔ C++ (Thrift)
 - **RESTful interface with Cookie-based authentication**
-- **Pluggable session backend:** Redis or in-memory store
+- **Pluggable backends**
+  - Sessions: **Redis** or **in-memory**
+  - **RPC result cache:** **Redis** or **in-memory** (JSON-serialized values, SHA‑256 request keys, TTL)
 - **Swagger UI** for interactive API documentation and testing
 - **Air live reload** for hot-reloading during backend development
 - **Docker Compose** setup, extendable to Kubernetes
@@ -50,6 +54,7 @@ harmonia/
  │   ├── gen/          # gRPC and Thrift stubs
  │   ├── internal/     # Application modules
  │   │   ├── auth/     # Cookie-based auth + session management
+ │   │   ├── cache/    # 🔹 Pluggable cache (memory/redis) for RPC results
  │   │   ├── logic/    # gRPC client for Python LogicService
  │   │   ├── engine/   # Thrift client for C++ EngineService
  │   │   ├── hello/    # Sample hello endpoints
@@ -142,7 +147,7 @@ All services (gateway, logic, engine, frontend) will start together.
 ## 🧩 Services Summary
 | Service | Language | Protocol | Port | Description |
 |----------|-----------|-----------|-------|--------------|
-| API Gateway | Go | REST / JSON | 8080 | Routes requests, manages cookies/sessions |
+| API Gateway | Go | REST / JSON | 8080 | Routes requests, manages cookies/sessions, caches RPC results |
 | Logic Service | Python | gRPC | 9002 | Evaluates expressions, transforms data, plans tasks |
 | Compute Engine | C++ | Thrift | 9101 | Performs numerical and matrix computations |
 | Frontend | Next.js | HTTP | 3000 | User interface for login and compute dashboard |
@@ -157,9 +162,10 @@ All services (gateway, logic, engine, frontend) will start together.
 | RPC | gRPC (Python), Thrift (C++) |
 | Database | MySQL |
 | Session Store | Redis / In-memory |
+| RPC Result Cache | Redis / In-memory |
 | Deployment | Docker Compose, Kubernetes-ready |
 
 ---
 
 ## 🏁 Status
-Harmonia is actively evolving to demonstrate **cross-language orchestration**, **hybrid compute pipelines**, and **real-world service integration** between Go, Python, and C++ systems.
+Harmonia is actively evolving to demonstrate **cross-language orchestration**, **hybrid compute pipelines**, and **real-world service integration** between Go, Python, and C++ systems — with a **pluggable cache** for fast, idempotent RPC responses.
