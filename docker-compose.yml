@@ -13,6 +13,7 @@ services:
       - LOGIC_ADDR=reco-py:9002
       - ENGINE_ADDR=engine-cpp:9101
       - SESSION_BACKEND=redis
+      - CACHE_BACKEND=redis
     volumes:
       - ./api-gw:/app
       - api_gw_gomod:/go/pkg/mod

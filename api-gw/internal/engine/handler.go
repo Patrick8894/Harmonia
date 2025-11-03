@@ -64,7 +64,7 @@ func (c *Controller) Pi(ctx *gin.Context) {
 	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 4*time.Second)
 	defer cancel()
 
-	resp, err := c.svc.EstimatePi(reqCtx, req.Samples)
+	resp, cached, err := c.svc.EstimatePi(reqCtx, req.Samples)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "RPC failed: " + err.Error()})
 		return
@@ -74,6 +74,7 @@ func (c *Controller) Pi(ctx *gin.Context) {
 		"inside": resp.GetInside(),
 		"total":  resp.GetTotal(),
 		"seed":   resp.GetSeed(),
+		"cached": cached,
 	})
 }
 
@@ -108,7 +109,7 @@ func (c *Controller) MatMul(ctx *gin.Context) {
 	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 6*time.Second)
 	defer cancel()
 
-	resp, err := c.svc.MatMul(reqCtx, req)
+	resp, cached, err := c.svc.MatMul(reqCtx, req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "RPC failed: " + err.Error()})
 		return
@@ -120,6 +121,7 @@ func (c *Controller) MatMul(ctx *gin.Context) {
 			"cols": C.GetCols(),
 			"data": C.GetData(),
 		},
+		"cached": cached,
 	})
 }
 
@@ -147,7 +149,7 @@ func (c *Controller) Stats(ctx *gin.Context) {
 	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 3*time.Second)
 	defer cancel()
 
-	resp, err := c.svc.ComputeStats(reqCtx, StatsDTO{Data: req.Data, Sample: &sample})
+	resp, cached, err := c.svc.ComputeStats(reqCtx, StatsDTO{Data: req.Data, Sample: &sample})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "RPC failed: " + err.Error()})
 		return
@@ -160,5 +162,6 @@ func (c *Controller) Stats(ctx *gin.Context) {
 		"stddev":   resp.GetStddev(),
 		"min":      resp.GetMin(),
 		"max":      resp.GetMax(),
+		"cached":   cached,
 	})
 }

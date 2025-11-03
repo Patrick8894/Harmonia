@@ -66,7 +66,7 @@ func (c *Controller) Evaluate(ctx *gin.Context) {
 	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 3*time.Second)
 	defer cancel()
 
-	resp, err := c.svc.Evaluate(reqCtx, req)
+	resp, fromCache, err := c.svc.Evaluate(reqCtx, req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "RPC failed: " + err.Error()})
 		return
@@ -74,6 +74,7 @@ func (c *Controller) Evaluate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"result": resp.GetResult(),
 		"error":  resp.GetError(),
+		"cached": fromCache,
 	})
 }
 
@@ -97,7 +98,7 @@ func (c *Controller) Transform(ctx *gin.Context) {
 	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 5*time.Second)
 	defer cancel()
 
-	resp, err := c.svc.Transform(reqCtx, req)
+	resp, fromCache, err := c.svc.Transform(reqCtx, req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "RPC failed: " + err.Error()})
 		return
@@ -106,6 +107,7 @@ func (c *Controller) Transform(ctx *gin.Context) {
 		"data":   resp.GetData(),
 		"result": resp.GetResult(),
 		"error":  resp.GetError(),
+		"cached": fromCache,
 	})
 }
 
@@ -129,14 +131,15 @@ func (c *Controller) Plan(ctx *gin.Context) {
 	reqCtx, cancel := context.WithTimeout(ctx.Request.Context(), 8*time.Second)
 	defer cancel()
 
-	resp, err := c.svc.PlanTasks(reqCtx, req)
+	resp, cached, err := c.svc.PlanTasks(reqCtx, req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "RPC failed: " + err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"tasks": resp.GetTasks(),
-		"notes": resp.GetNotes(),
-		"error": resp.GetError(),
+		"tasks":  resp.GetTasks(),
+		"notes":  resp.GetNotes(),
+		"error":  resp.GetError(),
+		"cached": cached,
 	})
 }

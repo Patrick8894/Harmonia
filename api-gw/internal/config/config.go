@@ -19,6 +19,10 @@ type Config struct {
 	DBDSN          string
 	RedisAddr      string
 	SessionBackend string // "redis" | "memory"
+
+	// Cache
+	CacheBackend    string // "redis" | "memory"
+	CacheTTLSeconds int
 }
 
 func get(key, def string) string {
@@ -69,5 +73,8 @@ func Load() Config {
 		DBDSN:          get("DB_DSN", "harmonia:harmonia@tcp(localhost:3306)/harmonia?parseTime=true"),
 		RedisAddr:      get("REDIS_ADDR", "localhost:6379"),
 		SessionBackend: get("SESSION_BACKEND", "memory"), // or "redis"
+
+		CacheBackend:    get("CACHE_BACKEND", "memory"), // or "redis"
+		CacheTTLSeconds: getInt("CACHE_TTL_SECONDS", 60),
 	}
 }
