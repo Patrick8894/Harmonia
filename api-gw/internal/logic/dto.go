@@ -9,9 +9,9 @@ type EvalDTO struct {
 
 type TransformDTO struct {
 	Data    []float64 `json:"data"     binding:"required"`
-	Expr    string    `json:"expr"`                        // optional
-	VarName string    `json:"var_name"`                    // optional
-	Op      string    `json:"op"       binding:"required"` // "MAP" | "FILTER" | "SUM" (case-insensitive) or number
+	Expr    string    `json:"expression"`                         // optional
+	VarName string    `json:"var_name"`                           // optional
+	Op      string    `json:"operation"       binding:"required"` // "MAP" | "FILTER" | "SUM" (case-insensitive) or number
 }
 
 type PlanDTO struct {

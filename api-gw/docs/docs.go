@@ -759,7 +759,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "data",
-                "op"
+                "operation"
             ],
             "properties": {
                 "data": {
@@ -768,11 +768,11 @@ const docTemplate = `{
                         "type": "number"
                     }
                 },
-                "expr": {
+                "expression": {
                     "description": "optional",
                     "type": "string"
                 },
-                "op": {
+                "operation": {
                     "description": "\"MAP\" | \"FILTER\" | \"SUM\" (case-insensitive) or number",
                     "type": "string"
                 },

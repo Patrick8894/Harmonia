@@ -10,7 +10,7 @@ set -e
 THRIFT_FILE="../thrift/engine.thrift"
 BUILD_DIR="build"
 GEN_DIR="gen-cpp"
-EXECUTABLE="$BUILD_DIR/engine"
+EXECUTABLE="$BUILD_DIR/engine_server"
 
 if [ "$1" == "clean" ]; then
   echo "🧹 Cleaning build artifacts and generated files..."

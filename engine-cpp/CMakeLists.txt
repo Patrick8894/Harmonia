@@ -38,6 +38,9 @@ target_link_libraries(engine_server
 )
 
 # Optional clients
+add_executable(hello_client  clients/hello_client.cpp)
+target_link_libraries(hello_client engine_gen thrift Threads::Threads)
+
 add_executable(pi_client     clients/pi_client.cpp)
 target_link_libraries(pi_client engine_gen thrift Threads::Threads)
 

@@ -98,10 +98,10 @@ definitions:
         items:
           type: number
         type: array
-      expr:
+      expression:
         description: optional
         type: string
-      op:
+      operation:
         description: '"MAP" | "FILTER" | "SUM" (case-insensitive) or number'
         type: string
       var_name:
@@ -109,7 +109,7 @@ definitions:
         type: string
     required:
     - data
-    - op
+    - operation
     type: object
 info:
   contact: {}
